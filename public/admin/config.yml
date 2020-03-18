@@ -1,0 +1,22 @@
+backend:
+  name: git-gateway
+  branch: master
+media_folder: public/img
+public_folder: img
+collections:
+  - name: "pages"
+    label: "Pages"
+    files:
+      - label: "Capstone"
+        name: "capstone"
+        file: "content/capstone.md"
+        fields:
+          - {label: "Title", name: "title", widget: "string"}
+          - {label: "Publish Date", name: "date", widget: "datetime"}
+          - {label: "Body", name: "body", widget: "markdown"}
+          - label: 'Lessons Learned'
+            name: "lessons"
+            widget: list
+            fields:
+              - {label: "Lesson", name: "lesson", widget: "string"}
+              - {label: "Description", name: "description", widget: "markdown"}
