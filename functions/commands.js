@@ -1,7 +1,11 @@
 import React from 'react';
 import Link from 'next/link';
 const projects = [
-  { name: 'atp-scraper', link: 'https://github.com/Sammyalhashe/ATPScraper' },
+  {
+      name: 'atp-scraper',
+      pageLink: '/atp_scraper',
+      link: 'https://github.com/Sammyalhashe/ATPScraper',
+  },
   {
     name: 'atp-commandline',
     pageLink: '',
@@ -9,7 +13,7 @@ const projects = [
   },
   {
     name: 'dashcam-speed visualizer',
-    pageLink: '',
+    pageLink: '/Dashcam',
     link: 'https://github.com/Sammyalhashe/commai-source',
   },
   {
@@ -19,7 +23,7 @@ const projects = [
   },
   {
     name: 'popular-movies',
-    pageLink: '',
+    pageLink: '/PopularMovies',
     link: 'https://github.com/Sammyalhashe/PopularMovies',
   },
 ];

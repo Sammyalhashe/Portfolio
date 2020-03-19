@@ -1,15 +1,55 @@
+---
 backend:
   name: git-gateway
   branch: master
 media_folder: public/img
 public_folder: img
 collections:
-  - name: "pages"
-    label: "Pages"
+  - name: "projects"
+    label: "Projects"
     files:
       - label: "Capstone"
         name: "capstone"
         file: "content/capstone.md"
+        fields:
+          - {label: "Title", name: "title", widget: "string"}
+          - {label: "Publish Date", name: "date", widget: "datetime"}
+          - {label: "Body", name: "body", widget: "markdown"}
+          - label: 'Lessons Learned'
+            name: "lessons"
+            widget: list
+            fields:
+              - {label: "Lesson", name: "lesson", widget: "string"}
+              - {label: "Description", name: "description", widget: "markdown"}
+      - label: "Atp-Scraper"
+        name: "atpscraper"
+        file: "content/atp.md"
+        fields:
+          - {label: "Title", name: "title", widget: "string"}
+          - {label: "Publish Date", name: "date", widget: "datetime"}
+          - {label: "Body", name: "body", widget: "markdown"}
+          - label: 'Lessons Learned'
+            name: "lessons"
+            widget: list
+            fields:
+              - {label: "Lesson", name: "lesson", widget: "string"}
+              - {label: "Description", name: "description", widget: "markdown"}
+      - label: "Dashcam Speed Visualizer"
+        name: "dashcam"
+        file: "content/dashcam.md"
+        fields:
+          - {label: "Title", name: "title", widget: "string"}
+          - {label: "Publish Date", name: "date", widget: "datetime"}
+          - {label: "Body", name: "body", widget: "markdown"}
+          - label: 'Lessons Learned'
+            name: "lessons"
+            widget: list
+            fields:
+              - {label: "Lesson", name: "lesson", widget: "string"}
+              - {label: "Description", name: "description", widget: "markdown"}
+      - label: "Popular Movies"
+        name: "movies"
+        file: "content/popular_movies.md"
         fields:
           - {label: "Title", name: "title", widget: "string"}
           - {label: "Publish Date", name: "date", widget: "datetime"}
