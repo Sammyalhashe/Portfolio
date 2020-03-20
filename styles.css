@@ -1,84 +1,91 @@
-@import "https://fonts.googleapis.com/css?family=Source+Code+Pro&display=swap";
+@import 'https://fonts.googleapis.com/css?family=Source+Code+Pro&display=swap';
+html {
+  scrollbar-width: none; /* For Firefox */
+  -ms-overflow-style: none; /* For Internet Explorer and Edge */
+}
+
+html::-webkit-scrollbar {
+  width: 0px; /* For Chrome, Safari, and Opera */
+}
+
 body {
-    background: black;
-    background-repeat: repeat;
-    font-family: "Source Code Pro", monospace;
-    color: white;
+  background: black;
+  background-repeat: repeat;
+  font-family: 'Source Code Pro', monospace;
+  color: white;
 }
 
 .main {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .prompt {
-    display: inline-block;
-    color: red;
-    padding-top: 5px;
-    padding-left: 5px;
+  display: inline-block;
+  color: red;
+  padding-top: 5px;
+  padding-left: 5px;
 }
 
-.prompt-input>input {
-    border: 0;
-    outline: none;
-    background: inherit;
-    font: inherit;
-    color: inherit;
+.prompt-input > input {
+  border: 0;
+  outline: none;
+  background: inherit;
+  font: inherit;
+  color: inherit;
 }
 
 .output {
-    margin-left: 5px;
+  margin-left: 5px;
 }
 
 .info {
-    padding: 10px;
-    color: green;
+  padding: 10px;
+  color: green;
 }
 
 .info .highlighted-info {
-    color: cyan;
+  color: cyan;
 }
 
 .highlight {
-    color: orange;
+  color: orange;
 }
 
 .error {
-    color: red;
+  color: red;
 }
 
-
 .project-link {
-    color: red;
-    background-color: blue;
+  color: red;
+  background-color: blue;
 }
 
 .project-link:hover {
-    background-color: yellow;
+  background-color: yellow;
 }
 
-
 @media only screen and (max-width: 480px) {
-    .prompt-lg {
-        display: none;
-    }
+  .prompt-lg {
+    display: none;
+  }
 }
 
 @media only screen and (min-width: 481px) {
-    .prompt-sm {
-        display: none;
-    }
+  .prompt-sm {
+    display: none;
+  }
 }
 
 .image {
-    padding: 10px;
-    overflow: hidden;
+  padding: 10px;
+  overflow: hidden;
 }
 
 .image img {
-    width: 260px;
-    height: 200px;
+  width: 260px;
+  height: 200px;
 }

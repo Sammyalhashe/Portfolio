@@ -23,7 +23,7 @@ Interpolator.propTypes = {
     Proptypes.shape({
       cmd: Proptypes.string,
       result: Proptypes.node,
-    }),
+    })
   ).isRequired,
 };
 

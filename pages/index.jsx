@@ -24,7 +24,7 @@ function HomePage() {
           result,
         };
         setInterps([...interps, cmdRes]);
-       } else {
+      } else {
         let cmdRes;
         if (cmd === '') {
           cmdRes = {
@@ -49,7 +49,7 @@ function HomePage() {
   };
   return (
     <div className="main">
-       <Head>
+      <Head>
         <title>My profile</title>
       </Head>
       <Interpolator interpolatedResults={interps} />
