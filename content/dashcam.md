@@ -47,7 +47,7 @@ lessons:
       Learned to organize myself and complete a project on a very short
       timeframe
 ---
-[<img src="/img/screen-shot-2020-03-20-at-12.45.06-am.png" width="700">](/img/screen-shot-2020-03-20-at-12.45.06-am.png)
+[<img src="/img/screen-shot-2020-03-20-at-12.45.06-am.png" width="700" />](/img/screen-shot-2020-03-20-at-12.45.06-am.png)
 
 ### Summary
 
