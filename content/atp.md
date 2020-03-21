@@ -12,9 +12,14 @@ lessons:
 
       * I learned to optimize requests and make tradeoffs in my design decisions
       to boost overall performance.
-        * Ie. I implemented a `TtlCache` to optimize api speed with use.
-        * I reset this cache every 24hrs, knowing the ATP updates their rankings and stats once a day.
-        * I know this because I have watched ATP tennis for 17 years.
+
+      * Ie. I implemented a `TtlCache` to optimize api speed with use.
+
+      * I reset this cache every 24hrs, knowing the ATP updates their rankings
+      and stats once a day.
+
+      * I know this because I have watched ATP tennis for 17 years.
+
       * I also learned how to properly design endpoints that were easy to
       understand and implement. This required me to spend a decent amount of
       time working on proper deocumentation in the form of a webapp.
