@@ -2,9 +2,9 @@ import React from 'react';
 import Link from 'next/link';
 const projects = [
   {
-      name: 'atp-scraper',
-      pageLink: '/atp_scraper',
-      link: 'https://github.com/Sammyalhashe/ATPScraper',
+    name: 'atp-scraper',
+    pageLink: '/atp_scraper',
+    link: 'https://github.com/Sammyalhashe/ATPScraper',
   },
   {
     name: 'atp-commandline',
@@ -31,13 +31,24 @@ const projects = [
 const work_terms = [
   {
     name: 'Morgan-Stanley',
-    file: '/pages/ms.html',
+    file: '/MorganStanley',
   },
   {
     name: 'Microsemi',
-    file: `/pages/microsemi.html`,
+    file: `/Microsemi`,
   },
 ];
+
+function inObjectArray(arr, field, value) {
+  for (let i = 0; i < arr.length; i++) {
+    const el = arr[i];
+    if (value === el[field].toLowerCase().trim()) {
+      return [true, i];
+    }
+  }
+  return [false, -1];
+}
+
 const cmds = {
   help: () => {
     return (
@@ -69,6 +80,10 @@ const cmds = {
         <div className="info">
           Enter <span className="highlight">"old"</span> to open my older
           portfolio
+        </div>
+        <div className="info">
+          Enter <span className="highlight">"picture"</span> to see a picture of
+          me{' '}
         </div>
       </div>
     );
@@ -157,6 +172,52 @@ const cmds = {
         <img src="/collision_pic.jpg" alt="A picture of me" />
       </div>
     );
+  },
+  exps: flag => {
+    if (flag.length === 0) {
+      return (
+        <div>
+          {work_terms.map((term, idx) => {
+            return (
+              <span key={term + idx} className="info">
+                <a className="project-link" href={term.file}>
+                  {term.name}
+                </a>
+              </span>
+            );
+          })}
+        </div>
+      );
+    } else {
+      if (flag.length !== 1 || flag[0].length <= 2) {
+        return null;
+      }
+      if (flag[0].substr(0, 2) !== '--') {
+        console.log(flag[0].substr(0, 2));
+        return null;
+      }
+      const modifiedFlag = flag[0]
+        .substr(2)
+        .toLowerCase()
+        .trim();
+      const ioa = inObjectArray(work_terms, 'name', modifiedFlag);
+      if (ioa[0]) {
+        return (
+          <span className="info">
+            <Link className="project-link" href={work_terms[ioa[1]].file}>
+              <a className="project-link">{work_terms[ioa[1]].name}</a>
+            </Link>
+          </span>
+        );
+      } else {
+        return (
+          <div className="output error">
+            Undefined project: &nbsp;
+            {flag[0]}
+          </div>
+        );
+      }
+    }
   },
 };
 

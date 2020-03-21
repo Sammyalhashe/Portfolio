@@ -1,15 +1,32 @@
 import React, { useRef, useEffect } from 'react';
 import Proptypes from 'prop-types';
 
-function Input({ cmdFunction }) {
+function Input({ cmdFunction, results }) {
   const textInput = useRef(null);
-
+  let index = results.length;
   const onEnter = e => {
     if (e.key === 'Enter') {
-      const cmd = e.target.value.trim();
+      const cmd = e.target.value.trim().split(' ');
       cmdFunction(cmd);
       textInput.current.value = '';
       textInput.current.focus();
+    } else if (e.key === 'ArrowUp') {
+      if (index - 1 >= 0) {
+        index--;
+        const newText = results[index];
+        textInput.current.value = newText.cmd;
+      }
+    } else if (e.key === 'ArrowDown') {
+      if (index + 1 < results.length) {
+        index++;
+        const newText = results[index];
+        textInput.current.value = newText.cmd;
+      } else {
+        if (!(index >= results.length)) {
+          index++;
+        }
+        textInput.current.value = '';
+      }
     }
   };
 
@@ -28,7 +45,7 @@ function Input({ cmdFunction }) {
         <input
           id="current"
           ref={textInput}
-          onKeyPress={onEnter}
+          onKeyDown={onEnter}
           type="text"
           placeholder="enter help..."
         />
@@ -39,6 +56,7 @@ function Input({ cmdFunction }) {
 
 Input.propTypes = {
   cmdFunction: Proptypes.func.isRequired,
+  results: Proptypes.array.isRequired,
   // focused: Proptypes.bool.isRequired,
 };
 
