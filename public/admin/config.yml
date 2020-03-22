@@ -60,3 +60,32 @@ collections:
             fields:
               - {label: "Lesson", name: "lesson", widget: "string"}
               - {label: "Description", name: "description", widget: "markdown"}
+  - name: "Work"
+    label: "Work"
+    files:
+      - label: "Microsemi"
+        name: "microsemi"
+        file: "content/microsemi.md"
+        fields:
+          - {label: "Title", name: "title", widget: "string"}
+          - {label: "Publish Date", name: "date", widget: "datetime"}
+          - {label: "Body", name: "body", widget: "markdown"}
+          - label: 'Lessons Learned'
+            name: "lessons"
+            widget: list
+            fields:
+              - {label: "Lesson", name: "lesson", widget: "string"}
+              - {label: "Description", name: "description", widget: "markdown"}
+      - label: "Morgan Stanley"
+        name: "morgan-stanley"
+        file: "content/ms.md"
+        fields:
+          - {label: "Title", name: "title", widget: "string"}
+          - {label: "Publish Date", name: "date", widget: "datetime"}
+          - {label: "Body", name: "body", widget: "markdown"}
+          - label: 'Lessons Learned'
+            name: "lessons"
+            widget: list
+            fields:
+              - {label: "Lesson", name: "lesson", widget: "string"}
+              - {label: "Description", name: "description", widget: "markdown"}
