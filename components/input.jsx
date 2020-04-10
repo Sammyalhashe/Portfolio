@@ -13,12 +13,18 @@ function Input({ cmdFunction, results }) {
     } else if (e.key === 'ArrowUp') {
       if (index - 1 >= 0) {
         index--;
+        while (!results[index].cmd && index - 1 >= 0) {
+            index--;
+        }
         const newText = results[index];
         textInput.current.value = newText.cmd;
       }
     } else if (e.key === 'ArrowDown') {
       if (index + 1 < results.length) {
         index++;
+        while (!results[index].cmd && index + 1 < results.length) {
+            index++;
+        }
         const newText = results[index];
         textInput.current.value = newText.cmd;
       } else {
