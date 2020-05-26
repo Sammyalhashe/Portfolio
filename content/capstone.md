@@ -24,7 +24,8 @@ lessons:
       it could be flexible to their own modifications. During our weekly
       meetings, the team and I weekly connected with the lab to give a status
       update and a mini-project demo. We did so to make sure the end-product
-      would
+      would be to the stakeholder's specifications. In addition, if they did not
+      like some feature, they would let us know well in advance.
     lesson: Learned to collaborate with stakeholders frequently
 ---
 * Built a charting application that reads data that is interfaced from a _ni daqmx_ board and serial ports
