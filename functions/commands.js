@@ -168,7 +168,7 @@ const cmds = {
   },
   picture: () => {
     return (
-      <div id="object" class="image">
+      <div id="object" className="image">
         <img src="/collision_pic.jpg" alt="A picture of me" />
       </div>
     );

@@ -1,5 +1,5 @@
-import React from 'react';
-import Proptypes from 'prop-types';
+import React from "react";
+import Proptypes from "prop-types";
 
 function Interpolator({ interpolatedResults }) {
   const mappedResults = interpolatedResults.map((res, index) => {
@@ -22,9 +22,9 @@ Interpolator.propTypes = {
   interpolatedResults: Proptypes.arrayOf(
     Proptypes.shape({
       cmd: Proptypes.string,
-      result: Proptypes.node,
+      result: Proptypes.node
     })
-  ).isRequired,
+  ).isRequired
 };
 
 export default Interpolator;

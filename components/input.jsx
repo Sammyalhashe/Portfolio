@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import Proptypes from 'prop-types';
 
-function Input({ cmdFunction, results }) {
+function Input({ cmdFunction, results, handleEnter }) {
   const textInput = useRef(null);
   let index = results.length;
   const onEnter = e => {
@@ -34,6 +34,7 @@ function Input({ cmdFunction, results }) {
         textInput.current.value = '';
       }
     }
+    handleEnter(textInput);
   };
 
   // NOTE emulating componentDidMount with useEffect
