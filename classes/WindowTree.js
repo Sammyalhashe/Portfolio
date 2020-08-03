@@ -33,7 +33,7 @@ class Node {
         this.left = left;
         this.right = right;
     }
-    
+
     insertNewSplit(node, direction = Split.HORIZONTAL) {
         // means nothing if not a leaf
         if (this.isLeaf) {
@@ -50,7 +50,7 @@ class Node {
                 this,                   // left
                 node                    // right
             ); // create new split node
-            
+
             // set the parent directions of the nodes accordingly
             this.parentDir = ParentDirection.LEFT;
             node.parentDir = ParentDirection.RIGHT;
@@ -96,6 +96,7 @@ class WindowTree {
         if (this.shellMap.has(nodeId)) {
             this.removeNode(nodeId);
             this.context(this.renderTree(this.rootNode));
+			console.log(this.printTree());
         }
     }
 
@@ -115,7 +116,7 @@ class WindowTree {
         if (this.shellMap.has(targetNodeId) && this.shellMap.get(targetNodeId).isLeaf) {
             const newUuid = uuidv4();
             const newNode = new Node(newUuid, <Shell removeHandle={this} splitHandle={this} nodeId={newUuid} />); // nodeId val
-            
+
             this.shellMap.set(newUuid, newNode);
             const splitNode = this.shellMap
                 .get(targetNodeId)
@@ -123,13 +124,13 @@ class WindowTree {
             // add the splitNode to the collection of nodes if the method created one
             if (splitNode) {
                 this.shellMap.set(splitNode.nodeId, splitNode);
-                console.log(splitNode.left, splitNode.right)
                 // reset the root if necessary
                 if (targetNodeId === this.rootId) {
                     this.rootId = splitNode.nodeId;
                     this.root = splitNode;
                 }
             }
+			this.printTree();
             return newNode;
         }
         return null;
@@ -138,6 +139,8 @@ class WindowTree {
     removeNode(targetNodeId) {
         // we shouldn't be able to remove the root Node
         if (this.shellMap.has(targetNodeId) && !(this.rootId === targetNodeId)) {
+			console.log(targetNodeId)
+			this.printTree();
             const nodeToRemove = this.shellMap.get(targetNodeId);
             const parent = nodeToRemove.parent;
 
@@ -168,6 +171,24 @@ class WindowTree {
         }
     }
 
+	printTree() {
+		let built = "";
+		let helper = (node) =>  {
+			if (!node) {
+				built += "null";
+				return;
+			}
+			built += "(";
+			built += node.nodeId.toString() + ",";
+			helper(node.left);
+			built += ",";
+			helper(node.right);
+			built += ")";
+		}
+		helper(this.root);
+		return built;
+	}
+
     renderTree(node) {
         if (node.isLeaf) {
             return node.val;
@@ -187,7 +208,7 @@ class WindowTree {
                 </div>
             );
         }
-        
+
     }
 }
 

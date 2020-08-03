@@ -42,7 +42,7 @@ function Shell({ nodeId, splitHandle, removeHandle }) {
     } else if (cmd.toLowerCase() === 'down') {
         splitHandle.handleSplitFromId(shellId, 0);
     } else if (cmd.toLowerCase() === 'exit') {
-
+		splitHandle.handleRemoveFromId(shellId);
     } else {
       const f = cmds[cmd.toLowerCase()];
       if (f !== undefined && f !== null) {
