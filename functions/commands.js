@@ -219,6 +219,13 @@ const cmds = {
       }
     }
   },
+  budg: () => {
+    return (
+      <div style={{width: '100%'}}>
+        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeqxtXSNFg0TB43QKslFEvI0tXnnL9YqkROrDVsPMMnekiW_A/viewform" title="Submit Budget"></iframe>
+      </div>
+    );
+  }
 };
 
 export default cmds;
