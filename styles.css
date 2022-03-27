@@ -80,6 +80,12 @@ body {
   }
 }
 
+.wrapper {
+  display: flex;
+  justify-content: center;
+  align-content: center;
+}
+
 .image {
   padding: 10px;
   overflow: hidden;
@@ -88,6 +94,12 @@ body {
 .image img {
   width: 260px;
   height: 200px;
+}
+
+.longinfo {
+  word-wrap: anywhere;
+  padding: 10px;
+  color: green;
 }
 
 .shellContainer {
