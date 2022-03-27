@@ -57,6 +57,12 @@ const cmds = {
           Enter <span className="highlight">"info"</span> to get my general info
         </div>
         <div className="info">
+          Enter <span className="highlight">"ls"</span> to see everything in the directory that you can interact with
+        </div>
+        <div class="info">
+            Enter <span class="highlight">"coffee"</span> to send a tip if you want :)
+        </div>
+        <div className="info">
           Enter <span className="highlight">"project"</span> to see my projects
         </div>
         <div className="info">
@@ -107,6 +113,27 @@ const cmds = {
       </div>
     );
   },
+  coffee: () => {
+    return (
+        <div class="wrapper">
+            <div id="object">
+                <div class="wrapper">
+                    <div className="info">
+                        Monero address: 
+                    </div>
+                </div>
+                <div class="wrapper">
+                    <img src="/QR_code.png" alt="Donations are appreciated :)"/>
+                </div>
+                <div class="wrapper">
+                    <div class="longinfo">
+                        48bks8r6hSL5thvR6Skrps7jY3itJp4oSGuH9JRTGTz6jUaguqgdMpcgkFa7Tz81LQLLGH1DjaUnn9odXXxFATQVQBLKp1S
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+  },
   project: () => {
     const projs = projects.map(project => {
       const link = () => {
@@ -132,6 +159,18 @@ const cmds = {
     });
     return <div className="output">{projs}</div>;
   },
+  ls: () => {
+    const all_things_to_see = [cmds.resume(true), cmds.project(), cmds.exps("")];
+    return (
+        <div class="wrapper">
+            {
+                all_things_to_see.map((thing, idx) => {
+                    return <span key={idx}>{thing}</span>;
+                })
+            }
+        </div>
+    );
+  },
   old: () => {
     const a = document.createElement('a');
     a.target = '_blank';
@@ -140,15 +179,25 @@ const cmds = {
     a.remove();
     return <div className="output info">Website opened on another tab...</div>;
   },
-  resume: () => {
-    const a = document.createElement('a');
-    a.target = '_blank';
-    a.href =
-      'https://firebasestorage.googleapis.com/v0/b/arduinohandler.appspot.com/o/Downloadable%2Fresume.pdf?alt=media&token=42bc0b75-770a-48ac-90de-e31703ae4b73';
-    a.click();
-    a.remove();
+  resume: (inline=false) => {
+    const href = "https://firebasestorage.googleapis.com/v0/b/arduinohandler.appspot.com/o/Downloadable%2Fsammy_resume_2021.pdf?alt=media&token=d8461310-6928-4202-8bf7-445f78e88064";
+    if (!inline) {
+        const a = document.createElement('a');
+        a.target = '_blank';
+        a.href = href;
+        a.click();
+        a.remove();
 
-    return <div className="output info">Resume opened on new page</div>;
+        return <div className="output info">Resume opened on new page</div>;
+    } else {
+        return (
+          <span className="info">
+            <a className="project-link" href={href}>
+              resume.pdf
+            </a>
+          </span>
+        );
+    }
   },
   github: () => {
     const a = document.createElement('a');
