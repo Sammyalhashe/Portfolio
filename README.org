@@ -1,1 +1,3 @@
 #+TITLE: Personal WebsiteBlog
+
+I wanted to create an interactive personal website. I use a terminal all the time so I thought it was a cool idea.
