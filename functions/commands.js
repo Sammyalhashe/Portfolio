@@ -180,7 +180,7 @@ const cmds = {
     return <div className="output info">Website opened on another tab...</div>;
   },
   resume: (inline=false) => {
-    const href = "https://firebasestorage.googleapis.com/v0/b/arduinohandler.appspot.com/o/Downloadable%2Fsammy_resume_2021.pdf?alt=media&token=d8461310-6928-4202-8bf7-445f78e88064";
+    const href = "https://firebasestorage.googleapis.com/v0/b/arduinohandler.appspot.com/o/Downloadable%2Fresume.pdf?alt=media&token=27edaac4-663e-49fd-b1e1-9d091365a051";
     if (!inline) {
         const a = document.createElement('a');
         a.target = '_blank';
