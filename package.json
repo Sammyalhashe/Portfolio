@@ -9,7 +9,7 @@
         "start": "next start",
         "test": "npm run dev",
         "prettier": "prettier",
-        "export": "npm run build && next export"
+        "export": "npm run build && next build"
     },
     "author": "",
     "license": "ISC",

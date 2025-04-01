@@ -8,5 +8,6 @@ module.exports = {
             }
         )
         return cfg;
-    }
+    },
+    output:'export',
 }
