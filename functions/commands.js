@@ -37,6 +37,10 @@ const work_terms = [
     name: 'Microsemi',
     file: `/Microsemi`,
   },
+  {
+    name: 'Bloomberg',
+    file: `/Bloomberg`,
+  },
 ];
 
 function inObjectArray(arr, field, value) {
@@ -59,8 +63,8 @@ const cmds = {
         <div className="info">
           Enter <span className="highlight">"ls"</span> to see everything in the directory that you can interact with
         </div>
-        <div class="info">
-            Enter <span class="highlight">"coffee"</span> to send a tip if you want :)
+        <div className="info">
+            Enter <span className="highlight">"coffee"</span> to send a tip if you want :)
         </div>
         <div className="info">
           Enter <span className="highlight">"project"</span> to see my projects
@@ -115,18 +119,18 @@ const cmds = {
   },
   coffee: () => {
     return (
-        <div class="wrapper">
+        <div className="wrapper">
             <div id="object">
-                <div class="wrapper">
+                <div className="wrapper">
                     <div className="info">
                         Monero address: 
                     </div>
                 </div>
-                <div class="wrapper">
+                <div className="wrapper">
                     <img src="/QR_code.png" alt="Donations are appreciated :)"/>
                 </div>
-                <div class="wrapper">
-                    <div class="longinfo">
+                <div className="wrapper">
+                    <div className="longinfo">
                         48bks8r6hSL5thvR6Skrps7jY3itJp4oSGuH9JRTGTz6jUaguqgdMpcgkFa7Tz81LQLLGH1DjaUnn9odXXxFATQVQBLKp1S
                     </div>
                 </div>
@@ -134,14 +138,14 @@ const cmds = {
         </div>
     );
   },
-  project: () => {
+  project: (unused, cb) => {
     const projs = projects.map(project => {
       const link = () => {
-        if (project.pageLink) {
+        if (project.pageLink && cb !== undefined & cb !== null) {
           return (
-            <Link href={project.pageLink}>
-              <a className="project-link">{project.name}</a>
-            </Link>
+            <a className="project-link" onClick={cb(project.pageLink)}>
+              {project.name}
+            </a>
           );
         } else {
           return (
@@ -159,10 +163,10 @@ const cmds = {
     });
     return <div className="output">{projs}</div>;
   },
-  ls: () => {
-    const all_things_to_see = [cmds.resume(true), cmds.project(), cmds.exps("")];
+  ls: (unused, cb) => {
+    const all_things_to_see = [cmds.resume(true), cmds.project(undefined, cb), cmds.exps("", cb)];
     return (
-        <div class="wrapper">
+        <div className="wrapper">
             {
                 all_things_to_see.map((thing, idx) => {
                     return <span key={idx}>{thing}</span>;
@@ -222,18 +226,29 @@ const cmds = {
       </div>
     );
   },
-  exps: flag => {
+  exps: (flag, cb) => {
     if (flag.length === 0) {
       return (
         <div>
           {work_terms.map((term, idx) => {
-            return (
-              <span key={term + idx} className="info">
-                <a className="project-link" href={term.file}>
-                  {term.name}
-                </a>
-              </span>
-            );
+            if (cb !== undefined && cb !== null) {
+                return (
+                  <span key={term + idx} className="info">
+                    <a className="project-link" onClick={cb(term.file)}>
+                      {term.name}
+                    </a>
+                  </span>
+                );
+            }
+            else {
+                return (
+                  <span key={term + idx} className="info">
+                    <a className="project-link" href={term.file}>
+                      {term.name}
+                    </a>
+                  </span>
+                );
+            }
           })}
         </div>
       );
@@ -254,7 +269,7 @@ const cmds = {
         return (
           <span className="info">
             <Link className="project-link" href={work_terms[ioa[1]].file}>
-              <a className="project-link">{work_terms[ioa[1]].name}</a>
+              {work_terms[ioa[1]].name}
             </Link>
           </span>
         );

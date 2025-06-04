@@ -1,8 +1,24 @@
 import React, { useState } from "react";
 import Interpolator from "./components/interpolator";
 import Input from "./components/input";
-
+import Microsemi from "./pages/Microsemi";
+import MorganStanley from "./pages/MorganStanley";
+import Capstone from "./pages/Capstone";
+import PopularMovies from "./pages/PopularMovies";
+import Dashcam from "./pages/Dashcam";
+import AtpScraper from "./pages/atp_scraper";
+import Bloomberg from "./pages/Bloomberg";
 import cmds from "./functions/commands";
+
+const StringToPageComponents = {
+    "Microsemi": Microsemi,
+    "MorganStanley": MorganStanley,
+    "Dashcam": Dashcam,
+    "PopularMovies": PopularMovies,
+    "Capstone": Capstone,
+    "atp_scraper": AtpScraper,
+    "Bloomberg": Bloomberg
+};
 
 function Shell({ nodeId, splitHandle, removeHandle }) {
   const shellId = nodeId;
@@ -47,7 +63,25 @@ function Shell({ nodeId, splitHandle, removeHandle }) {
       const f = cmds[cmd.toLowerCase()];
       if (f !== undefined && f !== null) {
         let result;
-        if (f.length > 0) {
+        if (cmd.toLowerCase() === "exps" || cmd.toLowerCase() === "ls" || cmd.toLowerCase() === "project") {
+            result = f("", x => {
+                const a = x.slice(1); // remove the '/'
+                return y => {
+                    let Component = StringToPageComponents[a];
+                    const cmdRes = buildCmdRes(cmdarr.join(" "), (() => {
+                        return (
+                            <div className="output info">
+                                <Component/>
+                            </div>
+                        );
+                    })());
+
+                    setInterps([...interps, cmdRes]);
+                    setLegacyInterps([...legacyInterps, cmdRes]);
+                };
+            });
+        }
+        else if (f.length > 0) {
           result = f(cmdarr.slice(1));
         } else {
           result = f();

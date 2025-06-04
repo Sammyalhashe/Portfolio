@@ -6,7 +6,7 @@ export default () => {
     let { title, date, lessons } = attributes;
 
     return (
-        <div className="main">
+        <div>
             <h1>{title}</h1>
             <h2>{date}</h2>
             <ScraperContent />
