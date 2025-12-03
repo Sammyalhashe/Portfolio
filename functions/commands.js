@@ -164,15 +164,60 @@ const cmds = {
     return <div className="output">{projs}</div>;
   },
   ls: (unused, cb) => {
-    const all_things_to_see = [cmds.resume(true), cmds.project(undefined, cb), cmds.exps("", cb)];
+    // 1. Resume
+    const resume = cmds.resume(true);
+
+    // 2. Projects
+    const projs = projects.map((project, idx) => {
+      const link = () => {
+        if (project.pageLink && cb !== undefined && cb !== null) {
+          return (
+            <a className="project-link" onClick={cb(project.pageLink)}>
+              {project.name}
+            </a>
+          );
+        } else {
+          return (
+            <a className="project-link" target="_blank" href={project.link}>
+              {project.name}
+            </a>
+          );
+        }
+      };
+      return (
+        <span key={'proj-' + idx} className="info">
+          {link()}
+        </span>
+      );
+    });
+
+    // 3. Work Terms (Experiments/Experience)
+    const exps = work_terms.map((term, idx) => {
+      if (cb !== undefined && cb !== null) {
+        return (
+          <span key={'exp-' + idx} className="info">
+            <a className="project-link" onClick={cb(term.file)}>
+              {term.name}
+            </a>
+          </span>
+        );
+      } else {
+        return (
+          <span key={'exp-' + idx} className="info">
+            <a className="project-link" href={term.file}>
+              {term.name}
+            </a>
+          </span>
+        );
+      }
+    });
+
     return (
-        <div className="wrapper">
-            {
-                all_things_to_see.map((thing, idx) => {
-                    return <span key={idx}>{thing}</span>;
-                })
-            }
-        </div>
+      <div className="output ls-grid">
+        {resume}
+        {projs}
+        {exps}
+      </div>
     );
   },
   old: () => {
