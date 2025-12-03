@@ -9,6 +9,7 @@ import Dashcam from "./pages/Dashcam";
 import AtpScraper from "./pages/atp_scraper";
 import Bloomberg from "./pages/Bloomberg";
 import cmds from "./functions/commands";
+import postMap from "./functions/post_loader";
 
 const StringToPageComponents = {
     "Microsemi": Microsemi,
@@ -20,12 +21,8 @@ const StringToPageComponents = {
     "Bloomberg": Bloomberg
 };
 
-function Shell({ nodeId, splitHandle, removeHandle }) {
+function Shell({ nodeId, splitHandle, removeHandle, interps, setInterps, legacyInterps, setLegacyInterps }) {
   const shellId = nodeId;
-
-  // interpolator related constants
-  const [interps, setInterps] = useState([]);
-  const [legacyInterps, setLegacyInterps] = useState([]);
 
   // build commands
   const buildCmdRes = (cmd, result) => {
@@ -63,11 +60,30 @@ function Shell({ nodeId, splitHandle, removeHandle }) {
       const f = cmds[cmd.toLowerCase()];
       if (f !== undefined && f !== null) {
         let result;
-        if (cmd.toLowerCase() === "exps" || cmd.toLowerCase() === "ls" || cmd.toLowerCase() === "project") {
+        if (cmd.toLowerCase() === "exps" || cmd.toLowerCase() === "ls" || cmd.toLowerCase() === "project" || cmd.toLowerCase() === "posts") {
             result = f("", x => {
                 const a = x.slice(1); // remove the '/'
                 return y => {
-                    let Component = StringToPageComponents[a];
+                    let Component;
+                    if (a.startsWith('post/')) {
+                        const slug = a.replace('post/', '');
+                        const Post = postMap[slug];
+                        if (Post) {
+                           const { attributes, react: Content } = Post;
+                           Component = () => (
+                             <div>
+                               <h1>{attributes.title}</h1>
+                               <h2>{attributes.date}</h2>
+                               <Content />
+                             </div>
+                           );
+                        } else {
+                            Component = () => <div>Post not found</div>;
+                        }
+                    } else {
+                        Component = StringToPageComponents[a];
+                    }
+
                     const cmdRes = buildCmdRes(cmdarr.join(" "), (() => {
                         return (
                             <div className="output info">
