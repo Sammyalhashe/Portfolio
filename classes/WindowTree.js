@@ -30,6 +30,7 @@ class Node {
         this.dirSplit = dirSplit;
         this.isLeaf = isLeaf;
         this.parent = parent;
+        this.parentDir = parentDir;
         this.left = left;
         this.right = right;
     }
@@ -51,13 +52,16 @@ class Node {
                 node                    // right
             ); // create new split node
 
+            // save the old parentDir
+            const oldParentDir = this.parentDir;
+
             // set the parent directions of the nodes accordingly
             this.parentDir = ParentDirection.LEFT;
             node.parentDir = ParentDirection.RIGHT;
 
             // attach the parent based on the parent direction
             if (this.parent) {
-                switch (this.parentDir) {
+                switch (oldParentDir) {
                     case ParentDirection.RIGHT:
                         this.parent.right = splitNode;
                         break;
@@ -154,15 +158,19 @@ class WindowTree {
             // set the new parent
             const parentOfParent = parent.parent;
             if (parentOfParent) {
-                const direction = parentOfParent.parentDir;
+                const direction = parent.parentDir;
                 if (direction === ParentDirection.LEFT) {
                     parentOfParent.left = nodeLeftOver;
                 } else {
                     parentOfParent.right = nodeLeftOver;
                 }
+                nodeLeftOver.parent = parentOfParent;
+                nodeLeftOver.parentDir = direction;
             } else { // we set a new root
                 this.root = nodeLeftOver;
                 this.rootId = nodeLeftOver.nodeId;
+                nodeLeftOver.parent = null;
+                nodeLeftOver.parentDir = ParentDirection.NONE;
             }
 
             // remove the nodes that need to be removed
