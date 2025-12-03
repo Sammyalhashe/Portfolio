@@ -1,5 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
+import postMap from './post_loader';
+
 const projects = [
   {
     name: 'atp-scraper',
@@ -62,6 +64,9 @@ const cmds = {
         </div>
         <div className="info">
           Enter <span className="highlight">"ls"</span> to see everything in the directory that you can interact with
+        </div>
+        <div className="info">
+          Enter <span className="highlight">"posts"</span> to see my blog posts
         </div>
         <div className="info">
             Enter <span className="highlight">"coffee"</span> to send a tip if you want :)
@@ -164,16 +169,120 @@ const cmds = {
     return <div className="output">{projs}</div>;
   },
   ls: (unused, cb) => {
-    const all_things_to_see = [cmds.resume(true), cmds.project(undefined, cb), cmds.exps("", cb)];
+    // 1. Resume
+    const resume = cmds.resume(true);
+
+    // 2. Projects
+    const projs = projects.map((project, idx) => {
+      const link = () => {
+        if (project.pageLink && cb !== undefined && cb !== null) {
+          return (
+            <a className="project-link" onClick={cb(project.pageLink)}>
+              {project.name}
+            </a>
+          );
+        } else {
+          return (
+            <a className="project-link" target="_blank" href={project.link}>
+              {project.name}
+            </a>
+          );
+        }
+      };
+      return (
+        <span key={'proj-' + idx} className="info">
+          {link()}
+        </span>
+      );
+    });
+
+    // 3. Work Terms (Experiments/Experience)
+    const exps = work_terms.map((term, idx) => {
+      if (cb !== undefined && cb !== null) {
+        return (
+          <span key={'exp-' + idx} className="info">
+            <a className="project-link" onClick={cb(term.file)}>
+              {term.name}
+            </a>
+          </span>
+        );
+      } else {
+        return (
+          <span key={'exp-' + idx} className="info">
+            <a className="project-link" href={term.file}>
+              {term.name}
+            </a>
+          </span>
+        );
+      }
+    });
+
     return (
-        <div className="wrapper">
-            {
-                all_things_to_see.map((thing, idx) => {
-                    return <span key={idx}>{thing}</span>;
-                })
-            }
-        </div>
+      <div className="output ls-grid">
+        {resume}
+        {projs}
+        {exps}
+      </div>
     );
+  },
+  posts: (unused, cb) => {
+    const postLinks = Object.keys(postMap).map((slug) => {
+      const PostContent = postMap[slug].react;
+      const attributes = postMap[slug].attributes;
+
+      const link = () => {
+        if (cb !== undefined && cb !== null) {
+          // Pass a special format that Shell.jsx recognizes for rendering components
+          // The format logic in Shell.jsx expects a string starting with "/" to look up in StringToPageComponents
+          // But here we want to render the Markdown component directly.
+          // We need to adapt Shell.jsx or trick it.
+          // Currently Shell.jsx does:
+          // result = f("", x => {
+          //   const a = x.slice(1);
+          //   let Component = StringToPageComponents[a];
+          //   ...
+          // })
+
+          // Since we can't easily modify StringToPageComponents dynamically in Shell.jsx from here,
+          // we can pass a callback that returns the Component directly if we change Shell.jsx logic,
+          // OR we can update Shell.jsx to handle a special "post:" prefix or just pass the component itself.
+
+          // Let's look at Shell.jsx logic again:
+          // It calls cb(project.pageLink) which is a string.
+          // Then Shell.jsx uses that string to look up Component.
+
+          // I will use a different approach. I will modify Shell.jsx to accept an object or a special signal.
+          // But wait, the cb in Shell.jsx is:
+          // x => { ... }
+          // so we call cb("/someString")
+
+          // I'll use a hack: I'll register the posts into a global object that Shell can access,
+          // or I'll modify Shell.jsx to look up posts from post_loader as well.
+
+          // Better: Update Shell.jsx to try looking up in StringToPageComponents OR postMap.
+          // For now, let's just pass the slug with a prefix "/post/"
+
+          return (
+            <a className="project-link" onClick={cb('/post/' + slug)}>
+              {attributes.title || slug}
+            </a>
+          );
+        } else {
+          return (
+             // Fallback if no callback (shouldn't happen in Shell)
+             <span className="project-link">{attributes.title || slug}</span>
+          );
+        }
+      };
+
+      return (
+        <div key={slug} className="info">
+          {link()}
+        </div>
+      );
+    });
+
+    return <div className="output">{postLinks}</div>;
   },
   old: () => {
     const a = document.createElement('a');
