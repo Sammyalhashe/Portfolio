@@ -14,6 +14,93 @@ const ParentDirection = {
     NONE: 2,
 };
 
+const THEMES = {
+    default: {
+        '--bg-color': 'black',
+        '--text-color': 'white',
+        '--prompt-color': 'red',
+        '--info-color': 'green',
+        '--highlight-color': 'orange',
+        '--highlight-info-color': 'cyan',
+        '--error-color': 'red',
+        '--link-color': 'red',
+        '--link-bg-color': 'blue',
+        '--link-hover-bg-color': 'yellow',
+        '--modal-bg-color': 'black',
+        '--modal-border-color': 'green',
+    },
+    gruvbox: {
+        '--bg-color': '#282828',
+        '--text-color': '#ebdbb2',
+        '--prompt-color': '#cc241d',
+        '--info-color': '#98971a',
+        '--highlight-color': '#d79921',
+        '--highlight-info-color': '#458588',
+        '--error-color': '#cc241d',
+        '--link-color': '#ebdbb2',
+        '--link-bg-color': '#458588',
+        '--link-hover-bg-color': '#d79921',
+        '--modal-bg-color': '#282828',
+        '--modal-border-color': '#98971a',
+    },
+    nord: {
+        '--bg-color': '#2e3440',
+        '--text-color': '#d8dee9',
+        '--prompt-color': '#bf616a',
+        '--info-color': '#a3be8c',
+        '--highlight-color': '#ebcb8b',
+        '--highlight-info-color': '#88c0d0',
+        '--error-color': '#bf616a',
+        '--link-color': '#2e3440',
+        '--link-bg-color': '#88c0d0',
+        '--link-hover-bg-color': '#ebcb8b',
+        '--modal-bg-color': '#2e3440',
+        '--modal-border-color': '#a3be8c',
+    },
+    'nord light': {
+        '--bg-color': '#eceff4',
+        '--text-color': '#2e3440',
+        '--prompt-color': '#bf616a',
+        '--info-color': '#a3be8c',
+        '--highlight-color': '#d08770',
+        '--highlight-info-color': '#5e81ac',
+        '--error-color': '#bf616a',
+        '--link-color': '#eceff4',
+        '--link-bg-color': '#5e81ac',
+        '--link-hover-bg-color': '#d08770',
+        '--modal-bg-color': '#eceff4',
+        '--modal-border-color': '#a3be8c',
+    },
+    'github dark': {
+        '--bg-color': '#0d1117',
+        '--text-color': '#c9d1d9',
+        '--prompt-color': '#ff7b72',
+        '--info-color': '#3fb950',
+        '--highlight-color': '#d29922',
+        '--highlight-info-color': '#58a6ff',
+        '--error-color': '#ff7b72',
+        '--link-color': '#f0f6fc',
+        '--link-bg-color': '#1f6feb',
+        '--link-hover-bg-color': '#d29922',
+        '--modal-bg-color': '#0d1117',
+        '--modal-border-color': '#3fb950',
+    },
+    'github light': {
+        '--bg-color': '#ffffff',
+        '--text-color': '#24292f',
+        '--prompt-color': '#cf222e',
+        '--info-color': '#1a7f37',
+        '--highlight-color': '#9a6700',
+        '--highlight-info-color': '#0969da',
+        '--error-color': '#cf222e',
+        '--link-color': '#ffffff',
+        '--link-bg-color': '#0969da',
+        '--link-hover-bg-color': '#9a6700',
+        '--modal-bg-color': '#ffffff',
+        '--modal-border-color': '#1a7f37',
+    }
+};
+
 class Node {
     constructor(
         nodeId,
@@ -40,35 +127,6 @@ class Node {
     insertNewSplit(node, direction = Split.HORIZONTAL) {
         // means nothing if not a leaf
         if (this.isLeaf) {
-            // NOTE: Swapped existing node (this) to Right and new node (node) to Left
-            // This ensures existing content moves to the right/bottom, and new empty node is on left/top?
-            // Wait, previous logic was: `this`=Left, `node`=Right.
-            // Result: `this` (content) was first child (Bottom/Right?), `node` (empty) was second (Top/Left?).
-            // Let's re-verify renderTree logic.
-            // Horizontal: right child is top 50%, left child is bottom 50%.
-            // Vertical: right child is left 50%, left child is right 50%.
-
-            // Goal: "New node on the right/down should be brand new".
-            // So:
-            // Horizontal (Down): Bottom 50% should be New Empty. Top 50% should be Existing Content.
-            // Vertical (Right): Right 50% should be New Empty. Left 50% should be Existing Content.
-
-            // RenderTree logic (unchanged):
-            // Horizontal: Top = right child, Bottom = left child.
-            // Vertical: Left = right child, Right = left child.
-
-            // So for Horizontal (Down split):
-            // Top (Existing) = right child.
-            // Bottom (New Empty) = left child.
-            // So `this` -> right child. `node` -> left child.
-
-            // For Vertical (Right split):
-            // Left (Existing) = right child.
-            // Right (New Empty) = left child.
-            // So `this` -> right child. `node` -> left child.
-
-            // So in both cases, `this` should be assigned to `right` property, and `node` to `left` property.
-
             const newId = uuidv4();
             const splitNode = new Node(
                 newId,                  // nodeId
@@ -119,8 +177,10 @@ class Node {
 
 class WindowTree {
     shellMap = new Map();
-    blogView = 'inline';
+    blogView = 'popup';
     modalContent = null;
+    pageContent = null;
+    theme = 'default';
 
     handleSplitFromId(nodeId, direction) {
         if (this.shellMap.has(nodeId)) {
@@ -147,6 +207,30 @@ class WindowTree {
         this.context(this.render());
     }
 
+    setPage(content) {
+        this.pageContent = content;
+        // Update URL if page is closed
+        if (!content) {
+             const url = new URL(window.location);
+             url.searchParams.delete('post');
+             window.history.pushState({}, '', url);
+        }
+        this.context(this.render());
+    }
+
+    setTheme(themeName) {
+        if (THEMES[themeName]) {
+            this.theme = themeName;
+            const theme = THEMES[themeName];
+            Object.keys(theme).forEach(key => {
+                document.documentElement.style.setProperty(key, theme[key]);
+            });
+            this.context(this.render());
+            return true;
+        }
+        return false;
+    }
+
     constructor(surroundingContext) {
         this.context = surroundingContext;
         this.rootId = uuidv4();
@@ -158,6 +242,8 @@ class WindowTree {
         // Bind methods to this instance
         this.setBlogView = this.setBlogView.bind(this);
         this.setModal = this.setModal.bind(this);
+        this.setPage = this.setPage.bind(this);
+        this.setTheme = this.setTheme.bind(this);
     }
 
     get rootNode() {
@@ -258,6 +344,14 @@ class WindowTree {
                         </div>
                     </div>
                 )}
+                {this.pageContent && (
+                    <div className="page-overlay">
+                        <button className="page-close-button" onClick={() => this.setPage(null)}>X</button>
+                        <div className="page-content-wrapper">
+                            {this.pageContent}
+                        </div>
+                    </div>
+                )}
             </React.Fragment>
         );
     }
@@ -283,6 +377,8 @@ class WindowTree {
                     blogView={this.blogView}
                     setBlogView={this.setBlogView}
                     setModal={this.setModal}
+                    setPage={this.setPage}
+                    setTheme={this.setTheme}
                 />
             );
         }
