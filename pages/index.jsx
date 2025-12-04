@@ -15,7 +15,7 @@ function HomePage() {
       <Head>
         <title>My profile</title>
       </Head>
-        {renderTree.renderTree(renderTree.rootNode)}
+        {renderTree.render()}
     </div>
   );
 }
