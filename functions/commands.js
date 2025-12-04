@@ -2,60 +2,6 @@ import React from 'react';
 import Link from 'next/link';
 import postMap from './post_loader';
 
-const projects = [
-  {
-    name: 'atp-scraper',
-    pageLink: '/atp_scraper',
-    link: 'https://github.com/Sammyalhashe/ATPScraper',
-  },
-  {
-    name: 'atp-commandline',
-    pageLink: '',
-    link: 'https://github.com/Sammyalhashe/atp-commandline',
-  },
-  {
-    name: 'dashcam-speed visualizer',
-    pageLink: '/Dashcam',
-    link: 'https://github.com/Sammyalhashe/commai-source',
-  },
-  {
-    name: 'data-analysis and acquisition',
-    pageLink: '/Capstone',
-    link: 'https://github.com/Sammyalhashe/Charter-cp',
-  },
-  {
-    name: 'popular-movies',
-    pageLink: '/PopularMovies',
-    link: 'https://github.com/Sammyalhashe/PopularMovies',
-  },
-];
-
-// Fallback hardcoded work terms if needed, but exps command now uses postMap
-const work_terms = [
-  {
-    name: 'Morgan-Stanley',
-    file: '/MorganStanley',
-  },
-  {
-    name: 'Microsemi',
-    file: `/Microsemi`,
-  },
-  {
-    name: 'Bloomberg',
-    file: `/Bloomberg`,
-  },
-];
-
-function inObjectArray(arr, field, value) {
-  for (let i = 0; i < arr.length; i++) {
-    const el = arr[i];
-    if (value === el[field].toLowerCase().trim()) {
-      return [true, i];
-    }
-  }
-  return [false, -1];
-}
-
 const cmds = {
   help: () => {
     return (
@@ -142,7 +88,7 @@ const cmds = {
             <div id="object">
                 <div className="wrapper">
                     <div className="info">
-                        Monero address: 
+                        Monero address:
                     </div>
                 </div>
                 <div className="wrapper">
@@ -158,123 +104,82 @@ const cmds = {
     );
   },
   project: (unused, cb) => {
-    const projs = projects.map(project => {
-      const link = () => {
-        if (project.pageLink && cb !== undefined & cb !== null) {
+    // Filter postMap for projects (start with projects/)
+    const projLinks = Object.keys(postMap)
+        .filter(slug => slug.startsWith('projects/'))
+        .map((slug) => {
+          const attributes = postMap[slug].attributes;
+          // Use external link if pageLink not relevant for internal routing via Shell logic?
+          // The old logic used pageLink for internal routing via cb and link for external.
+          // Here, the project markdown can be viewed internally via /post/projects/xxx
+          // OR we can link externally if 'link' attribute is present.
+          // BUT 'projects' command usually listed internal links in the old version if pageLink was present.
+          // We will make them open internally like posts/exps.
+
+          const link = () => {
+            if (cb !== undefined && cb !== null) {
+              return (
+                <a className="project-link" onClick={cb('/post/' + slug)}>
+                  {attributes.title || slug.split('/')[1]}
+                </a>
+              );
+            } else {
+              // If inline (no callback), maybe link to external?
+              // Or just show title.
+              return (
+                 <a className="project-link" href={attributes.link} target="_blank">
+                    {attributes.title || slug.split('/')[1]}
+                 </a>
+              );
+            }
+          };
+
           return (
-            <a className="project-link" onClick={cb(project.pageLink)}>
-              {project.name}
-            </a>
+            <span key={slug} className="info">
+              {link()}
+            </span>
           );
-        } else {
-          return (
-            <a className="project-link" target="_blank" href={project.link}>
-              {project.name}
-            </a>
-          );
-        }
-      };
-      return (
-        <span key={project.name + project.link} className="info">
-          {link()}
-        </span>
-      );
-    });
-    return <div className="output">{projs}</div>;
+        });
+
+    return <div className="output">{projLinks}</div>;
   },
   ls: (unused, cb) => {
     // 1. Resume
     const resume = cmds.resume(true);
 
-    // 2. Projects
-    const projs = projects.map((project, idx) => {
-      const link = () => {
-        if (project.pageLink && cb !== undefined && cb !== null) {
-          return (
-            <a className="project-link" onClick={cb(project.pageLink)}>
-              {project.name}
-            </a>
-          );
-        } else {
-          return (
-            <a className="project-link" target="_blank" href={project.link}>
-              {project.name}
-            </a>
-          );
-        }
-      };
-      return (
-        <span key={'proj-' + idx} className="info">
-          {link()}
-        </span>
-      );
+    // 2. All items from postMap (projects, exps, posts)
+    const allLinks = Object.keys(postMap).map((slug, idx) => {
+        const attributes = postMap[slug].attributes;
+        const link = () => {
+            if (cb !== undefined && cb !== null) {
+                return (
+                    <a className="project-link" onClick={cb('/post/' + slug)}>
+                        {attributes.title || slug.split('/')[1] || slug}
+                    </a>
+                );
+            } else {
+                return (
+                    <span className="project-link">{attributes.title || slug.split('/')[1] || slug}</span>
+                );
+            }
+        };
+        return (
+            <span key={'item-' + idx} className="info">
+                {link()}
+            </span>
+        );
     });
-
-    // 3. Work Terms (Experiments/Experience)
-    // Filter postMap for experiences
-    const expLinks = Object.keys(postMap)
-        .filter(slug => postMap[slug].attributes.type === 'experience')
-        .map((slug, idx) => {
-            const attributes = postMap[slug].attributes;
-            const link = () => {
-                if (cb !== undefined && cb !== null) {
-                    return (
-                        <a className="project-link" onClick={cb('/post/' + slug)}>
-                            {attributes.title || slug}
-                        </a>
-                    );
-                } else {
-                    return (
-                        <span className="project-link">{attributes.title || slug}</span>
-                    );
-                }
-            };
-            return (
-                <span key={'exp-' + idx} className="info">
-                    {link()}
-                </span>
-            );
-        });
-
-    // 4. Posts
-    // Filter postMap for non-experiences (posts)
-    const postLinks = Object.keys(postMap)
-        .filter(slug => postMap[slug].attributes.type !== 'experience')
-        .map((slug, idx) => {
-            const attributes = postMap[slug].attributes;
-            const link = () => {
-                if (cb !== undefined && cb !== null) {
-                    return (
-                        <a className="project-link" onClick={cb('/post/' + slug)}>
-                            {attributes.title || slug}
-                        </a>
-                    );
-                } else {
-                    return (
-                        <span className="project-link">{attributes.title || slug}</span>
-                    );
-                }
-            };
-            return (
-                <span key={'post-' + idx} className="info">
-                    {link()}
-                </span>
-            );
-        });
-
 
     return (
       <div className="output ls-grid">
         {resume}
-        {projs}
-        {expLinks}
-        {postLinks}
+        {allLinks}
       </div>
     );
   },
   posts: (unused, cb) => {
     const postLinks = Object.keys(postMap)
-        .filter(slug => postMap[slug].attributes.type !== 'experience')
+        .filter(slug => slug.startsWith('posts/'))
         .map((slug) => {
           const attributes = postMap[slug].attributes;
 
@@ -282,12 +187,12 @@ const cmds = {
             if (cb !== undefined && cb !== null) {
               return (
                 <a className="project-link" onClick={cb('/post/' + slug)}>
-                  {attributes.title || slug}
+                  {attributes.title || slug.split('/')[1]}
                 </a>
               );
             } else {
               return (
-                 <span className="project-link">{attributes.title || slug}</span>
+                 <span className="project-link">{attributes.title || slug.split('/')[1]}</span>
               );
             }
           };
@@ -303,7 +208,7 @@ const cmds = {
   },
   exps: (flag, cb) => {
      const expLinks = Object.keys(postMap)
-        .filter(slug => postMap[slug].attributes.type === 'experience')
+        .filter(slug => slug.startsWith('exps/'))
         .map((slug) => {
           const attributes = postMap[slug].attributes;
 
@@ -311,12 +216,12 @@ const cmds = {
             if (cb !== undefined && cb !== null) {
               return (
                 <a className="project-link" onClick={cb('/post/' + slug)}>
-                  {attributes.title || slug}
+                  {attributes.title || slug.split('/')[1]}
                 </a>
               );
             } else {
               return (
-                 <span className="project-link">{attributes.title || slug}</span>
+                 <span className="project-link">{attributes.title || slug.split('/')[1]}</span>
               );
             }
           };

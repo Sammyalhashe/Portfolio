@@ -1,5 +1,5 @@
 import React from 'react';
-import { attributes, react as ScraperContent } from '../content/bloomberg.md';
+import { attributes, react as ScraperContent } from '../content/exps/bloomberg.md';
 import Lessons from '../components/Lessons';
 
 export default () => {

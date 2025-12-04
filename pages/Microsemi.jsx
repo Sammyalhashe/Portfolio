@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { attributes, react as ScraperContent } from '../content/microsemi.md';
+import { attributes, react as ScraperContent } from '../content/exps/microsemi.md';
 import Lessons from '../components/Lessons';
 
 export default () => {

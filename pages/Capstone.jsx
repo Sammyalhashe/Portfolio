@@ -1,5 +1,5 @@
 import React from "react";
-import { attributes, react as CapstoneContent } from "../content/capstone.md";
+import { attributes, react as CapstoneContent } from "../content/projects/capstone.md";
 import Lessons from "../components/Lessons";
 
 function Capstone() {

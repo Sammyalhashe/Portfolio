@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { attributes, react as ScraperContent } from '../content/ms.md';
+import { attributes, react as ScraperContent } from '../content/exps/ms.md';
 import Lessons from '../components/Lessons';
 
 export default () => {
