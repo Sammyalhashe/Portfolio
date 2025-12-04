@@ -30,6 +30,7 @@ const projects = [
   },
 ];
 
+// Fallback hardcoded work terms if needed, but exps command now uses postMap
 const work_terms = [
   {
     name: 'Morgan-Stanley',
@@ -210,92 +211,124 @@ const cmds = {
     });
 
     // 3. Work Terms (Experiments/Experience)
-    const exps = work_terms.map((term, idx) => {
-      if (cb !== undefined && cb !== null) {
-        return (
-          <span key={'exp-' + idx} className="info">
-            <a className="project-link" onClick={cb(term.file)}>
-              {term.name}
-            </a>
-          </span>
-        );
-      } else {
-        return (
-          <span key={'exp-' + idx} className="info">
-            <a className="project-link" href={term.file}>
-              {term.name}
-            </a>
-          </span>
-        );
-      }
-    });
+    // Filter postMap for experiences
+    const expLinks = Object.keys(postMap)
+        .filter(slug => postMap[slug].attributes.type === 'experience')
+        .map((slug, idx) => {
+            const attributes = postMap[slug].attributes;
+            const link = () => {
+                if (cb !== undefined && cb !== null) {
+                    return (
+                        <a className="project-link" onClick={cb('/post/' + slug)}>
+                            {attributes.title || slug}
+                        </a>
+                    );
+                } else {
+                    return (
+                        <span className="project-link">{attributes.title || slug}</span>
+                    );
+                }
+            };
+            return (
+                <span key={'exp-' + idx} className="info">
+                    {link()}
+                </span>
+            );
+        });
+
+    // 4. Posts
+    // Filter postMap for non-experiences (posts)
+    const postLinks = Object.keys(postMap)
+        .filter(slug => postMap[slug].attributes.type !== 'experience')
+        .map((slug, idx) => {
+            const attributes = postMap[slug].attributes;
+            const link = () => {
+                if (cb !== undefined && cb !== null) {
+                    return (
+                        <a className="project-link" onClick={cb('/post/' + slug)}>
+                            {attributes.title || slug}
+                        </a>
+                    );
+                } else {
+                    return (
+                        <span className="project-link">{attributes.title || slug}</span>
+                    );
+                }
+            };
+            return (
+                <span key={'post-' + idx} className="info">
+                    {link()}
+                </span>
+            );
+        });
+
 
     return (
       <div className="output ls-grid">
         {resume}
         {projs}
-        {exps}
+        {expLinks}
+        {postLinks}
       </div>
     );
   },
   posts: (unused, cb) => {
-    const postLinks = Object.keys(postMap).map((slug) => {
-      const PostContent = postMap[slug].react;
-      const attributes = postMap[slug].attributes;
+    const postLinks = Object.keys(postMap)
+        .filter(slug => postMap[slug].attributes.type !== 'experience')
+        .map((slug) => {
+          const attributes = postMap[slug].attributes;
 
-      const link = () => {
-        if (cb !== undefined && cb !== null) {
-          // Pass a special format that Shell.jsx recognizes for rendering components
-          // The format logic in Shell.jsx expects a string starting with "/" to look up in StringToPageComponents
-          // But here we want to render the Markdown component directly.
-          // We need to adapt Shell.jsx or trick it.
-          // Currently Shell.jsx does:
-          // result = f("", x => {
-          //   const a = x.slice(1);
-          //   let Component = StringToPageComponents[a];
-          //   ...
-          // })
-
-          // Since we can't easily modify StringToPageComponents dynamically in Shell.jsx from here,
-          // we can pass a callback that returns the Component directly if we change Shell.jsx logic,
-          // OR we can update Shell.jsx to handle a special "post:" prefix or just pass the component itself.
-
-          // Let's look at Shell.jsx logic again:
-          // It calls cb(project.pageLink) which is a string.
-          // Then Shell.jsx uses that string to look up Component.
-
-          // I will use a different approach. I will modify Shell.jsx to accept an object or a special signal.
-          // But wait, the cb in Shell.jsx is:
-          // x => { ... }
-          // so we call cb("/someString")
-
-          // I'll use a hack: I'll register the posts into a global object that Shell can access,
-          // or I'll modify Shell.jsx to look up posts from post_loader as well.
-
-          // Better: Update Shell.jsx to try looking up in StringToPageComponents OR postMap.
-          // For now, let's just pass the slug with a prefix "/post/"
+          const link = () => {
+            if (cb !== undefined && cb !== null) {
+              return (
+                <a className="project-link" onClick={cb('/post/' + slug)}>
+                  {attributes.title || slug}
+                </a>
+              );
+            } else {
+              return (
+                 <span className="project-link">{attributes.title || slug}</span>
+              );
+            }
+          };
 
           return (
-            <a className="project-link" onClick={cb('/post/' + slug)}>
-              {attributes.title || slug}
-            </a>
+            <div key={slug} className="info">
+              {link()}
+            </div>
           );
-        } else {
-          return (
-             // Fallback if no callback (shouldn't happen in Shell)
-             <span className="project-link">{attributes.title || slug}</span>
-          );
-        }
-      };
-
-      return (
-        <div key={slug} className="info">
-          {link()}
-        </div>
-      );
-    });
+        });
 
     return <div className="output">{postLinks}</div>;
+  },
+  exps: (flag, cb) => {
+     const expLinks = Object.keys(postMap)
+        .filter(slug => postMap[slug].attributes.type === 'experience')
+        .map((slug) => {
+          const attributes = postMap[slug].attributes;
+
+          const link = () => {
+            if (cb !== undefined && cb !== null) {
+              return (
+                <a className="project-link" onClick={cb('/post/' + slug)}>
+                  {attributes.title || slug}
+                </a>
+              );
+            } else {
+              return (
+                 <span className="project-link">{attributes.title || slug}</span>
+              );
+            }
+          };
+
+          return (
+            <div key={slug} className="info">
+              {link()}
+            </div>
+          );
+        });
+
+    return <div className="output">{expLinks}</div>;
   },
   old: () => {
     const a = document.createElement('a');
@@ -347,63 +380,6 @@ const cmds = {
         <img src="/collision_pic.jpg" alt="A picture of me" />
       </div>
     );
-  },
-  exps: (flag, cb) => {
-    if (flag.length === 0) {
-      return (
-        <div>
-          {work_terms.map((term, idx) => {
-            if (cb !== undefined && cb !== null) {
-                return (
-                  <span key={term + idx} className="info">
-                    <a className="project-link" onClick={cb(term.file)}>
-                      {term.name}
-                    </a>
-                  </span>
-                );
-            }
-            else {
-                return (
-                  <span key={term + idx} className="info">
-                    <a className="project-link" href={term.file}>
-                      {term.name}
-                    </a>
-                  </span>
-                );
-            }
-          })}
-        </div>
-      );
-    } else {
-      if (flag.length !== 1 || flag[0].length <= 2) {
-        return null;
-      }
-      if (flag[0].substr(0, 2) !== '--') {
-        console.log(flag[0].substr(0, 2));
-        return null;
-      }
-      const modifiedFlag = flag[0]
-        .substr(2)
-        .toLowerCase()
-        .trim();
-      const ioa = inObjectArray(work_terms, 'name', modifiedFlag);
-      if (ioa[0]) {
-        return (
-          <span className="info">
-            <Link className="project-link" href={work_terms[ioa[1]].file}>
-              {work_terms[ioa[1]].name}
-            </Link>
-          </span>
-        );
-      } else {
-        return (
-          <div className="output error">
-            Undefined project: &nbsp;
-            {flag[0]}
-          </div>
-        );
-      }
-    }
   },
   budg: () => {
     return (

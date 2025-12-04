@@ -198,3 +198,25 @@ body {
   margin: 0 auto;
   padding-top: 60px;
 }
+
+.theme-switcher-container {
+    position: absolute;
+    top: 20px;
+    right: 80px; /* Space for close button */
+    z-index: 2001;
+}
+
+.theme-select {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border: 1px solid var(--modal-border-color);
+    padding: 5px;
+    font-family: inherit;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+.theme-select:focus {
+    outline: none;
+    border-color: var(--highlight-color);
+}

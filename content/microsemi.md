@@ -1,6 +1,7 @@
 ---
 title: My time at Microsemi
 date: 2020-03-22T19:08:52.547Z
+type: experience
 lessons: []
 ---
 - Worked on the development of test structures and designs using Microsemi's design software, Libero, to assess and characterize Microsemi FPGA products that went to market.

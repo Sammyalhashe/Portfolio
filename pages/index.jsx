@@ -11,6 +11,9 @@ function HomePage() {
   const router = useRouter();
 
   useEffect(() => {
+    // Detect theme on mount
+    renderTree.detectTheme();
+
     if (router.isReady && router.query.post) {
       const slug = router.query.post;
       const Post = postMap[slug];

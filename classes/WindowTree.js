@@ -231,6 +231,16 @@ class WindowTree {
         return false;
     }
 
+    detectTheme() {
+        if (typeof window !== 'undefined' && window.matchMedia) {
+            if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+                this.setTheme('github light');
+            } else {
+                this.setTheme('default');
+            }
+        }
+    }
+
     constructor(surroundingContext) {
         this.context = surroundingContext;
         this.rootId = uuidv4();
@@ -244,6 +254,7 @@ class WindowTree {
         this.setModal = this.setModal.bind(this);
         this.setPage = this.setPage.bind(this);
         this.setTheme = this.setTheme.bind(this);
+        this.detectTheme = this.detectTheme.bind(this);
     }
 
     get rootNode() {
@@ -346,6 +357,17 @@ class WindowTree {
                 )}
                 {this.pageContent && (
                     <div className="page-overlay">
+                        <div className="theme-switcher-container">
+                            <select
+                                className="theme-select"
+                                value={this.theme}
+                                onChange={(e) => this.setTheme(e.target.value)}
+                            >
+                                {Object.keys(THEMES).map(theme => (
+                                    <option key={theme} value={theme}>{theme}</option>
+                                ))}
+                            </select>
+                        </div>
                         <button className="page-close-button" onClick={() => this.setPage(null)}>X</button>
                         <div className="page-content-wrapper">
                             {this.pageContent}
