@@ -116,7 +116,7 @@ const cmds = {
           Phone: <span className="info highlighted-info">647-463-2638</span>
           Email:{' '}
           <span className="info highlighted-info">
-            sammyalhashemi1@outlook.com
+            sammy@salh.xyz
           </span>
         </div>
       </div>
