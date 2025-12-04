@@ -1,6 +1,7 @@
 ---
 title: Python Charting Gui Application
 date: 2020-03-18T17:00:00.000Z
+link: https://github.com/Sammyalhashe/Charter-cp
 lessons:
   - description: >-
       This was my third time working on a large engineering project that had

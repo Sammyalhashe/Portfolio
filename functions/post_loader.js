@@ -2,12 +2,15 @@
 const postMap = {};
 
 function importAll(r) {
-  r.keys().forEach((key) => {
-    const slug = key.replace(/^\.\/|\.md$/g, '');
-    postMap[slug] = r(key);
-  });
+    r.keys().forEach((key) => {
+        // key is like './exps/ms.md' or './projects/atp.md'
+        // Remove the leading ./ and the extension .md
+        const slug = key.replace(/^\.\/|\.md$/g, '');
+        postMap[slug] = r(key);
+    });
 }
 
-importAll(require.context('../content', false, /\.md$/));
+// Load markdown files recursively from content directory
+importAll(require.context('../content', true, /\.md$/));
 
 export default postMap;
