@@ -6,8 +6,15 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils, ... }:
-    flake-utils.lib.eachDefaultSystem (system:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+      ...
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
       in
@@ -15,9 +22,7 @@
         devShell = pkgs.mkShell {
           buildInputs = with pkgs; [
             nodejs_20
-            npm
             git
-            yarn
           ];
 
           shellHook = ''
@@ -26,5 +31,6 @@
             echo "To start the development server, run: npm run dev"
           '';
         };
-      });
+      }
+    );
 }
