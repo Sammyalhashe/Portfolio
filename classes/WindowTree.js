@@ -30,15 +30,45 @@ class Node {
         this.dirSplit = dirSplit;
         this.isLeaf = isLeaf;
         this.parent = parent;
+        this.parentDir = parentDir;
         this.left = left;
         this.right = right;
+        this.interps = [];
+        this.legacyInterps = [];
     }
 
     insertNewSplit(node, direction = Split.HORIZONTAL) {
         // means nothing if not a leaf
         if (this.isLeaf) {
-            // NOTE: decided to put the current node as the left node always
-            // Node inserted is the right child of the split Node
+            // NOTE: Swapped existing node (this) to Right and new node (node) to Left
+            // This ensures existing content moves to the right/bottom, and new empty node is on left/top?
+            // Wait, previous logic was: `this`=Left, `node`=Right.
+            // Result: `this` (content) was first child (Bottom/Right?), `node` (empty) was second (Top/Left?).
+            // Let's re-verify renderTree logic.
+            // Horizontal: right child is top 50%, left child is bottom 50%.
+            // Vertical: right child is left 50%, left child is right 50%.
+
+            // Goal: "New node on the right/down should be brand new".
+            // So:
+            // Horizontal (Down): Bottom 50% should be New Empty. Top 50% should be Existing Content.
+            // Vertical (Right): Right 50% should be New Empty. Left 50% should be Existing Content.
+
+            // RenderTree logic (unchanged):
+            // Horizontal: Top = right child, Bottom = left child.
+            // Vertical: Left = right child, Right = left child.
+
+            // So for Horizontal (Down split):
+            // Top (Existing) = right child.
+            // Bottom (New Empty) = left child.
+            // So `this` -> right child. `node` -> left child.
+
+            // For Vertical (Right split):
+            // Left (Existing) = right child.
+            // Right (New Empty) = left child.
+            // So `this` -> right child. `node` -> left child.
+
+            // So in both cases, `this` should be assigned to `right` property, and `node` to `left` property.
+
             const newId = uuidv4();
             const splitNode = new Node(
                 newId,                  // nodeId
@@ -47,17 +77,22 @@ class Node {
                 false,                  // isLeaf
                 this.parent,            // parent
                 this.parentDir,         // parentDir
-                this,                   // left
-                node                    // right
+                node,                   // left (New Empty)
+                this                    // right (Existing Content)
             ); // create new split node
 
+            // save the old parentDir
+            const oldParentDir = this.parentDir;
+
             // set the parent directions of the nodes accordingly
-            this.parentDir = ParentDirection.LEFT;
-            node.parentDir = ParentDirection.RIGHT;
+            // `this` is now RIGHT child
+            this.parentDir = ParentDirection.RIGHT;
+            // `node` is now LEFT child
+            node.parentDir = ParentDirection.LEFT;
 
             // attach the parent based on the parent direction
             if (this.parent) {
-                switch (this.parentDir) {
+                switch (oldParentDir) {
                     case ParentDirection.RIGHT:
                         this.parent.right = splitNode;
                         break;
@@ -84,28 +119,45 @@ class Node {
 
 class WindowTree {
     shellMap = new Map();
+    blogView = 'inline';
+    modalContent = null;
 
     handleSplitFromId(nodeId, direction) {
         if (this.shellMap.has(nodeId)) {
             this.insertNodeAtSplit(nodeId, direction);
-            this.context(this.renderTree(this.rootNode));
+            this.context(this.render());
         }
     }
 
     handleRemoveFromId(nodeId) {
         if (this.shellMap.has(nodeId)) {
             this.removeNode(nodeId);
-            this.context(this.renderTree(this.rootNode));
+            this.context(this.render());
 			console.log(this.printTree());
         }
+    }
+
+    setBlogView(mode) {
+        this.blogView = mode;
+        this.context(this.render());
+    }
+
+    setModal(content) {
+        this.modalContent = content;
+        this.context(this.render());
     }
 
     constructor(surroundingContext) {
         this.context = surroundingContext;
         this.rootId = uuidv4();
-        const newNode = new Node(this.rootId, <Shell removeHandle={this} splitHandle={this} nodeId={this.rootId} />); // nodeId, val
+        // Pass null as val since we generate Shell dynamically in renderTree
+        const newNode = new Node(this.rootId, null);
         this.shellMap.set(this.rootId, newNode);
         this.root = newNode;
+
+        // Bind methods to this instance
+        this.setBlogView = this.setBlogView.bind(this);
+        this.setModal = this.setModal.bind(this);
     }
 
     get rootNode() {
@@ -115,7 +167,8 @@ class WindowTree {
     insertNodeAtSplit(targetNodeId, direction = Split.HORIZONTAL) {
         if (this.shellMap.has(targetNodeId) && this.shellMap.get(targetNodeId).isLeaf) {
             const newUuid = uuidv4();
-            const newNode = new Node(newUuid, <Shell removeHandle={this} splitHandle={this} nodeId={newUuid} />); // nodeId val
+            // Pass null as val
+            const newNode = new Node(newUuid, null);
 
             this.shellMap.set(newUuid, newNode);
             const splitNode = this.shellMap
@@ -154,15 +207,19 @@ class WindowTree {
             // set the new parent
             const parentOfParent = parent.parent;
             if (parentOfParent) {
-                const direction = parentOfParent.parentDir;
+                const direction = parent.parentDir;
                 if (direction === ParentDirection.LEFT) {
                     parentOfParent.left = nodeLeftOver;
                 } else {
                     parentOfParent.right = nodeLeftOver;
                 }
+                nodeLeftOver.parent = parentOfParent;
+                nodeLeftOver.parentDir = direction;
             } else { // we set a new root
                 this.root = nodeLeftOver;
                 this.rootId = nodeLeftOver.nodeId;
+                nodeLeftOver.parent = null;
+                nodeLeftOver.parentDir = ParentDirection.NONE;
             }
 
             // remove the nodes that need to be removed
@@ -189,20 +246,56 @@ class WindowTree {
 		return built;
 	}
 
+    render() {
+        return (
+            <React.Fragment>
+                {this.renderTree(this.root)}
+                {this.modalContent && (
+                    <div className="modal-overlay">
+                        <div className="modal-content">
+                            <button className="close-button" onClick={() => this.setModal(null)}>X</button>
+                            {this.modalContent}
+                        </div>
+                    </div>
+                )}
+            </React.Fragment>
+        );
+    }
+
     renderTree(node) {
         if (node.isLeaf) {
-            return node.val;
+            return (
+                <Shell
+                    key={node.nodeId}
+                    nodeId={node.nodeId}
+                    removeHandle={this}
+                    splitHandle={this}
+                    interps={node.interps}
+                    setInterps={(newInterps) => {
+                        node.interps = newInterps;
+                        this.context(this.render());
+                    }}
+                    legacyInterps={node.legacyInterps}
+                    setLegacyInterps={(newLegacy) => {
+                        node.legacyInterps = newLegacy;
+                        this.context(this.render());
+                    }}
+                    blogView={this.blogView}
+                    setBlogView={this.setBlogView}
+                    setModal={this.setModal}
+                />
+            );
         }
         if (node.dirSplit === Split.HORIZONTAL) {
             return (
-                <div style={{overflow: 'hidden', width: '100%', height: '100%', display: "flex", flexDirection: "column"}}>
+                <div key={node.nodeId} style={{overflow: 'hidden', width: '100%', height: '100%', display: "flex", flexDirection: "column"}}>
                     <div style={{width: '100%', height: '50%', borderBottom: 'solid grey 1px'}} className='shellContainer'>{this.renderTree(node.right)}</div>
                     <div style={{width: '100%', height: '50%'}} className='shellContainer'>{this.renderTree(node.left)}</div>
                 </div>
             );
         } else {
             return (
-                <div style={{width: '100%', height: '100%', display: "flex", flexDirection: "row"}}>
+                <div key={node.nodeId} style={{width: '100%', height: '100%', display: "flex", flexDirection: "row"}}>
                     <div style={{width: '50%', height: '100%', borderRight: 'solid grey 1px'}} className='shellContainer'>{this.renderTree(node.right)}</div>
                     <div style={{width: '50%', height: '100%'}} className='shellContainer'>{this.renderTree(node.left)}</div>
                 </div>

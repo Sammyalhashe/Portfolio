@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Interpolator from "./components/interpolator";
 import Input from "./components/input";
 import Microsemi from "./pages/Microsemi";
@@ -9,6 +9,7 @@ import Dashcam from "./pages/Dashcam";
 import AtpScraper from "./pages/atp_scraper";
 import Bloomberg from "./pages/Bloomberg";
 import cmds from "./functions/commands";
+import postMap from "./functions/post_loader";
 
 const StringToPageComponents = {
     "Microsemi": Microsemi,
@@ -20,12 +21,16 @@ const StringToPageComponents = {
     "Bloomberg": Bloomberg
 };
 
-function Shell({ nodeId, splitHandle, removeHandle }) {
+function Shell({ nodeId, splitHandle, removeHandle, interps, setInterps, legacyInterps, setLegacyInterps, blogView, setBlogView, setModal }) {
   const shellId = nodeId;
+  const shellRef = useRef(null);
 
-  // interpolator related constants
-  const [interps, setInterps] = useState([]);
-  const [legacyInterps, setLegacyInterps] = useState([]);
+  // Auto-scroll to bottom when interps change
+  useEffect(() => {
+    if (shellRef.current) {
+        shellRef.current.scrollTop = shellRef.current.scrollHeight;
+    }
+  }, [interps, legacyInterps]);
 
   // build commands
   const buildCmdRes = (cmd, result) => {
@@ -59,15 +64,60 @@ function Shell({ nodeId, splitHandle, removeHandle }) {
         splitHandle.handleSplitFromId(shellId, 0);
     } else if (cmd.toLowerCase() === 'exit') {
 		splitHandle.handleRemoveFromId(shellId);
+    } else if (cmd.toLowerCase() === 'conf') {
+        const arg = cmdarr[1];
+        if (arg && arg.startsWith('blogView:')) {
+            const mode = arg.split(':')[1];
+            if (mode === 'inline' || mode === 'popup') {
+                setBlogView(mode);
+                const cmdRes = buildCmdRes(cmdarr.join(" "), <div className="output info">Blog view set to {mode}</div>);
+                setInterps([...interps, cmdRes]);
+                setLegacyInterps([...legacyInterps, cmdRes]);
+            } else {
+                const cmdRes = buildCmdRes(cmdarr.join(" "), <div className="output error">Invalid mode. Use inline or popup</div>);
+                setInterps([...interps, cmdRes]);
+                setLegacyInterps([...legacyInterps, cmdRes]);
+            }
+        } else {
+            const cmdRes = buildCmdRes(cmdarr.join(" "), <div className="output error">Usage: conf blogView:&lt;inline/popup&gt;</div>);
+            setInterps([...interps, cmdRes]);
+            setLegacyInterps([...legacyInterps, cmdRes]);
+        }
     } else {
       const f = cmds[cmd.toLowerCase()];
       if (f !== undefined && f !== null) {
         let result;
-        if (cmd.toLowerCase() === "exps" || cmd.toLowerCase() === "ls" || cmd.toLowerCase() === "project") {
+        if (cmd.toLowerCase() === "exps" || cmd.toLowerCase() === "ls" || cmd.toLowerCase() === "project" || cmd.toLowerCase() === "posts") {
             result = f("", x => {
                 const a = x.slice(1); // remove the '/'
                 return y => {
-                    let Component = StringToPageComponents[a];
+                    let Component;
+                    if (a.startsWith('post/')) {
+                        const slug = a.replace('post/', '');
+                        const Post = postMap[slug];
+                        if (Post) {
+                           const { attributes, react: Content } = Post;
+                           Component = () => (
+                             <div>
+                               <h1>{attributes.title}</h1>
+                               <h2>{attributes.date}</h2>
+                               <Content />
+                             </div>
+                           );
+
+                           // Handle popup mode for posts
+                           if (blogView === 'popup') {
+                               setModal(<Component />);
+                               return; // Don't add to interps
+                           }
+
+                        } else {
+                            Component = () => <div>Post not found</div>;
+                        }
+                    } else {
+                        Component = StringToPageComponents[a];
+                    }
+
                     const cmdRes = buildCmdRes(cmdarr.join(" "), (() => {
                         return (
                             <div className="output info">
@@ -110,7 +160,7 @@ function Shell({ nodeId, splitHandle, removeHandle }) {
   };
 
   return (
-      <div style={{width: '100%', height: '100%', overflowY: 'scroll', paddingRight: '17px', boxSizing: 'content-box'}} className="shell" id={shellId}>
+      <div ref={shellRef} style={{width: '100%', height: '100%', overflowY: 'scroll', paddingRight: '17px', boxSizing: 'content-box'}} className="shell" id={shellId}>
       <Interpolator interpolatedResults={interps} />
       <Input cmdFunction={applyCmd} results={legacyInterps} handleEnter={handleEnter} />
     </div>
