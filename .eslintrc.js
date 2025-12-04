@@ -5,9 +5,9 @@ module.exports = {
     ],
     "rules": {
         "consistent-return": "off",
-        "indent": ["error", 4],
-        "react/jsx-indent": ["error", 4],
-        "react/jsx-indent-props": ["error", 4],
+        "indent": "off",
+        "react/jsx-indent": "off",
+        "react/jsx-indent-props": "off",
         "quotes": "off",
         "react/prop-types": "off",
         "react/react-in-jsx-scope": "off",
@@ -33,6 +33,9 @@ module.exports = {
         "react/no-unescaped-entities": "off",
         "jsx-a11y/anchor-is-valid": "off",
         "jsx-a11y/click-events-have-key-events": "off",
-        "jsx-a11y/no-static-element-interactions": "off"
+        "jsx-a11y/no-static-element-interactions": "off",
+        "semi": "off",
+        "object-curly-newline": "off",
+        "@next/next/no-sync-scripts": "off"
     }
 };
