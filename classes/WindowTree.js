@@ -14,6 +14,93 @@ const ParentDirection = {
     NONE: 2,
 };
 
+const THEMES = {
+    default: {
+        '--bg-color': 'black',
+        '--text-color': 'white',
+        '--prompt-color': 'red',
+        '--info-color': 'green',
+        '--highlight-color': 'orange',
+        '--highlight-info-color': 'cyan',
+        '--error-color': 'red',
+        '--link-color': 'red',
+        '--link-bg-color': 'blue',
+        '--link-hover-bg-color': 'yellow',
+        '--modal-bg-color': 'black',
+        '--modal-border-color': 'green',
+    },
+    gruvbox: {
+        '--bg-color': '#282828',
+        '--text-color': '#ebdbb2',
+        '--prompt-color': '#cc241d',
+        '--info-color': '#98971a',
+        '--highlight-color': '#d79921',
+        '--highlight-info-color': '#458588',
+        '--error-color': '#cc241d',
+        '--link-color': '#ebdbb2',
+        '--link-bg-color': '#458588',
+        '--link-hover-bg-color': '#d79921',
+        '--modal-bg-color': '#282828',
+        '--modal-border-color': '#98971a',
+    },
+    nord: {
+        '--bg-color': '#2e3440',
+        '--text-color': '#d8dee9',
+        '--prompt-color': '#bf616a',
+        '--info-color': '#a3be8c',
+        '--highlight-color': '#ebcb8b',
+        '--highlight-info-color': '#88c0d0',
+        '--error-color': '#bf616a',
+        '--link-color': '#2e3440',
+        '--link-bg-color': '#88c0d0',
+        '--link-hover-bg-color': '#ebcb8b',
+        '--modal-bg-color': '#2e3440',
+        '--modal-border-color': '#a3be8c',
+    },
+    'nord light': {
+        '--bg-color': '#eceff4',
+        '--text-color': '#2e3440',
+        '--prompt-color': '#bf616a',
+        '--info-color': '#a3be8c',
+        '--highlight-color': '#d08770',
+        '--highlight-info-color': '#5e81ac',
+        '--error-color': '#bf616a',
+        '--link-color': '#eceff4',
+        '--link-bg-color': '#5e81ac',
+        '--link-hover-bg-color': '#d08770',
+        '--modal-bg-color': '#eceff4',
+        '--modal-border-color': '#a3be8c',
+    },
+    'github dark': {
+        '--bg-color': '#0d1117',
+        '--text-color': '#c9d1d9',
+        '--prompt-color': '#ff7b72',
+        '--info-color': '#3fb950',
+        '--highlight-color': '#d29922',
+        '--highlight-info-color': '#58a6ff',
+        '--error-color': '#ff7b72',
+        '--link-color': '#f0f6fc',
+        '--link-bg-color': '#1f6feb',
+        '--link-hover-bg-color': '#d29922',
+        '--modal-bg-color': '#0d1117',
+        '--modal-border-color': '#3fb950',
+    },
+    'github light': {
+        '--bg-color': '#ffffff',
+        '--text-color': '#24292f',
+        '--prompt-color': '#cf222e',
+        '--info-color': '#1a7f37',
+        '--highlight-color': '#9a6700',
+        '--highlight-info-color': '#0969da',
+        '--error-color': '#cf222e',
+        '--link-color': '#ffffff',
+        '--link-bg-color': '#0969da',
+        '--link-hover-bg-color': '#9a6700',
+        '--modal-bg-color': '#ffffff',
+        '--modal-border-color': '#1a7f37',
+    }
+};
+
 class Node {
     constructor(
         nodeId,
@@ -30,15 +117,16 @@ class Node {
         this.dirSplit = dirSplit;
         this.isLeaf = isLeaf;
         this.parent = parent;
+        this.parentDir = parentDir;
         this.left = left;
         this.right = right;
+        this.interps = [];
+        this.legacyInterps = [];
     }
 
     insertNewSplit(node, direction = Split.HORIZONTAL) {
         // means nothing if not a leaf
         if (this.isLeaf) {
-            // NOTE: decided to put the current node as the left node always
-            // Node inserted is the right child of the split Node
             const newId = uuidv4();
             const splitNode = new Node(
                 newId,                  // nodeId
@@ -47,17 +135,22 @@ class Node {
                 false,                  // isLeaf
                 this.parent,            // parent
                 this.parentDir,         // parentDir
-                this,                   // left
-                node                    // right
+                node,                   // left (New Empty)
+                this                    // right (Existing Content)
             ); // create new split node
 
+            // save the old parentDir
+            const oldParentDir = this.parentDir;
+
             // set the parent directions of the nodes accordingly
-            this.parentDir = ParentDirection.LEFT;
-            node.parentDir = ParentDirection.RIGHT;
+            // `this` is now RIGHT child
+            this.parentDir = ParentDirection.RIGHT;
+            // `node` is now LEFT child
+            node.parentDir = ParentDirection.LEFT;
 
             // attach the parent based on the parent direction
             if (this.parent) {
-                switch (this.parentDir) {
+                switch (oldParentDir) {
                     case ParentDirection.RIGHT:
                         this.parent.right = splitNode;
                         break;
@@ -84,28 +177,73 @@ class Node {
 
 class WindowTree {
     shellMap = new Map();
+    blogView = 'popup';
+    modalContent = null;
+    pageContent = null;
+    theme = 'default';
 
     handleSplitFromId(nodeId, direction) {
         if (this.shellMap.has(nodeId)) {
             this.insertNodeAtSplit(nodeId, direction);
-            this.context(this.renderTree(this.rootNode));
+            this.context(this.render());
         }
     }
 
     handleRemoveFromId(nodeId) {
         if (this.shellMap.has(nodeId)) {
             this.removeNode(nodeId);
-            this.context(this.renderTree(this.rootNode));
+            this.context(this.render());
 			console.log(this.printTree());
         }
+    }
+
+    setBlogView(mode) {
+        this.blogView = mode;
+        this.context(this.render());
+    }
+
+    setModal(content) {
+        this.modalContent = content;
+        this.context(this.render());
+    }
+
+    setPage(content) {
+        this.pageContent = content;
+        // Update URL if page is closed
+        if (!content) {
+             const url = new URL(window.location);
+             url.searchParams.delete('post');
+             window.history.pushState({}, '', url);
+        }
+        this.context(this.render());
+    }
+
+    setTheme(themeName) {
+        if (THEMES[themeName]) {
+            this.theme = themeName;
+            const theme = THEMES[themeName];
+            Object.keys(theme).forEach(key => {
+                document.documentElement.style.setProperty(key, theme[key]);
+            });
+            this.context(this.render());
+            return true;
+        }
+        return false;
     }
 
     constructor(surroundingContext) {
         this.context = surroundingContext;
         this.rootId = uuidv4();
-        const newNode = new Node(this.rootId, <Shell removeHandle={this} splitHandle={this} nodeId={this.rootId} />); // nodeId, val
+        // Pass null as val since we generate Shell dynamically in renderTree
+        const newNode = new Node(this.rootId, null);
         this.shellMap.set(this.rootId, newNode);
         this.root = newNode;
+
+        // Bind methods to this instance
+        this.setBlogView = this.setBlogView.bind(this);
+        this.setModal = this.setModal.bind(this);
+        this.setPage = this.setPage.bind(this);
+        this.setTheme = this.setTheme.bind(this);
     }
 
     get rootNode() {
@@ -115,7 +253,8 @@ class WindowTree {
     insertNodeAtSplit(targetNodeId, direction = Split.HORIZONTAL) {
         if (this.shellMap.has(targetNodeId) && this.shellMap.get(targetNodeId).isLeaf) {
             const newUuid = uuidv4();
-            const newNode = new Node(newUuid, <Shell removeHandle={this} splitHandle={this} nodeId={newUuid} />); // nodeId val
+            // Pass null as val
+            const newNode = new Node(newUuid, null);
 
             this.shellMap.set(newUuid, newNode);
             const splitNode = this.shellMap
@@ -154,15 +293,19 @@ class WindowTree {
             // set the new parent
             const parentOfParent = parent.parent;
             if (parentOfParent) {
-                const direction = parentOfParent.parentDir;
+                const direction = parent.parentDir;
                 if (direction === ParentDirection.LEFT) {
                     parentOfParent.left = nodeLeftOver;
                 } else {
                     parentOfParent.right = nodeLeftOver;
                 }
+                nodeLeftOver.parent = parentOfParent;
+                nodeLeftOver.parentDir = direction;
             } else { // we set a new root
                 this.root = nodeLeftOver;
                 this.rootId = nodeLeftOver.nodeId;
+                nodeLeftOver.parent = null;
+                nodeLeftOver.parentDir = ParentDirection.NONE;
             }
 
             // remove the nodes that need to be removed
@@ -189,20 +332,66 @@ class WindowTree {
 		return built;
 	}
 
+    render() {
+        return (
+            <React.Fragment>
+                {this.renderTree(this.root)}
+                {this.modalContent && (
+                    <div className="modal-overlay">
+                        <div className="modal-content">
+                            <button className="close-button" onClick={() => this.setModal(null)}>X</button>
+                            {this.modalContent}
+                        </div>
+                    </div>
+                )}
+                {this.pageContent && (
+                    <div className="page-overlay">
+                        <button className="page-close-button" onClick={() => this.setPage(null)}>X</button>
+                        <div className="page-content-wrapper">
+                            {this.pageContent}
+                        </div>
+                    </div>
+                )}
+            </React.Fragment>
+        );
+    }
+
     renderTree(node) {
         if (node.isLeaf) {
-            return node.val;
+            return (
+                <Shell
+                    key={node.nodeId}
+                    nodeId={node.nodeId}
+                    removeHandle={this}
+                    splitHandle={this}
+                    interps={node.interps}
+                    setInterps={(newInterps) => {
+                        node.interps = newInterps;
+                        this.context(this.render());
+                    }}
+                    legacyInterps={node.legacyInterps}
+                    setLegacyInterps={(newLegacy) => {
+                        node.legacyInterps = newLegacy;
+                        this.context(this.render());
+                    }}
+                    blogView={this.blogView}
+                    setBlogView={this.setBlogView}
+                    setModal={this.setModal}
+                    setPage={this.setPage}
+                    setTheme={this.setTheme}
+                />
+            );
         }
         if (node.dirSplit === Split.HORIZONTAL) {
             return (
-                <div style={{overflow: 'hidden', width: '100%', height: '100%', display: "flex", flexDirection: "column"}}>
+                <div key={node.nodeId} style={{overflow: 'hidden', width: '100%', height: '100%', display: "flex", flexDirection: "column"}}>
                     <div style={{width: '100%', height: '50%', borderBottom: 'solid grey 1px'}} className='shellContainer'>{this.renderTree(node.right)}</div>
                     <div style={{width: '100%', height: '50%'}} className='shellContainer'>{this.renderTree(node.left)}</div>
                 </div>
             );
         } else {
             return (
-                <div style={{width: '100%', height: '100%', display: "flex", flexDirection: "row"}}>
+                <div key={node.nodeId} style={{width: '100%', height: '100%', display: "flex", flexDirection: "row"}}>
                     <div style={{width: '50%', height: '100%', borderRight: 'solid grey 1px'}} className='shellContainer'>{this.renderTree(node.right)}</div>
                     <div style={{width: '50%', height: '100%'}} className='shellContainer'>{this.renderTree(node.left)}</div>
                 </div>
