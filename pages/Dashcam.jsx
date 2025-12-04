@@ -1,5 +1,5 @@
 import React from "react";
-import { attributes, react as DashcamContent } from "../content/dashcam.md";
+import { attributes, react as DashcamContent } from "../content/projects/dashcam.md";
 import Lessons from "../components/Lessons";
 
 export default () => {

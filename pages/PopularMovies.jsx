@@ -1,5 +1,5 @@
 import React from 'react';
-import { attributes, react as PopularMovies } from '../content/popular_movies.md';
+import { attributes, react as PopularMovies } from '../content/projects/popular_movies.md';
 import Lessons from '../components/Lessons';
 
 export default () => {
