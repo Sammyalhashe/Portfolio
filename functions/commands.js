@@ -69,6 +69,19 @@ const cmds = {
           Enter <span className="highlight">"posts"</span> to see my blog posts
         </div>
         <div className="info">
+          Enter <span className="highlight">"right"</span> to split the terminal to the right
+        </div>
+        <div className="info">
+          Enter <span className="highlight">"down"</span> to split the terminal down
+        </div>
+        <div className="info">
+          Enter <span className="highlight">"conf"</span> to configure the terminal
+          <br/>
+          Usage: <span className="highlight">conf blogView:&lt;inline/popup/page&gt;</span> or <span className="highlight">conf theme:&lt;theme&gt;</span>
+          <br/>
+          Supported themes: default, gruvbox, nord, nord light, github dark, github light
+        </div>
+        <div className="info">
             Enter <span className="highlight">"coffee"</span> to send a tip if you want :)
         </div>
         <div className="info">

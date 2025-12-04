@@ -21,7 +21,7 @@ const StringToPageComponents = {
     "Bloomberg": Bloomberg
 };
 
-function Shell({ nodeId, splitHandle, removeHandle, interps, setInterps, legacyInterps, setLegacyInterps, blogView, setBlogView, setModal }) {
+function Shell({ nodeId, splitHandle, removeHandle, interps, setInterps, legacyInterps, setLegacyInterps, blogView, setBlogView, setModal, setPage, setTheme }) {
   const shellId = nodeId;
   const shellRef = useRef(null);
 
@@ -68,18 +68,29 @@ function Shell({ nodeId, splitHandle, removeHandle, interps, setInterps, legacyI
         const arg = cmdarr[1];
         if (arg && arg.startsWith('blogView:')) {
             const mode = arg.split(':')[1];
-            if (mode === 'inline' || mode === 'popup') {
+            if (mode === 'inline' || mode === 'popup' || mode === 'page') {
                 setBlogView(mode);
                 const cmdRes = buildCmdRes(cmdarr.join(" "), <div className="output info">Blog view set to {mode}</div>);
                 setInterps([...interps, cmdRes]);
                 setLegacyInterps([...legacyInterps, cmdRes]);
             } else {
-                const cmdRes = buildCmdRes(cmdarr.join(" "), <div className="output error">Invalid mode. Use inline or popup</div>);
+                const cmdRes = buildCmdRes(cmdarr.join(" "), <div className="output error">Invalid mode. Use inline, popup, or page</div>);
+                setInterps([...interps, cmdRes]);
+                setLegacyInterps([...legacyInterps, cmdRes]);
+            }
+        } else if (arg && arg.startsWith('theme:')) {
+            const themeName = cmdarr.slice(1).join(' ').replace('theme:', '');
+            if (setTheme(themeName)) {
+                const cmdRes = buildCmdRes(cmdarr.join(" "), <div className="output info">Theme set to {themeName}</div>);
+                setInterps([...interps, cmdRes]);
+                setLegacyInterps([...legacyInterps, cmdRes]);
+            } else {
+                const cmdRes = buildCmdRes(cmdarr.join(" "), <div className="output error">Invalid theme. Check help for options</div>);
                 setInterps([...interps, cmdRes]);
                 setLegacyInterps([...legacyInterps, cmdRes]);
             }
         } else {
-            const cmdRes = buildCmdRes(cmdarr.join(" "), <div className="output error">Usage: conf blogView:&lt;inline/popup&gt;</div>);
+            const cmdRes = buildCmdRes(cmdarr.join(" "), <div className="output error">Usage: conf blogView:&lt;inline/popup/page&gt; or conf theme:&lt;theme&gt;</div>);
             setInterps([...interps, cmdRes]);
             setLegacyInterps([...legacyInterps, cmdRes]);
         }
@@ -108,6 +119,13 @@ function Shell({ nodeId, splitHandle, removeHandle, interps, setInterps, legacyI
                            // Handle popup mode for posts
                            if (blogView === 'popup') {
                                setModal(<Component />);
+                               return; // Don't add to interps
+                           } else if (blogView === 'page') {
+                               // Update URL
+                               const url = new URL(window.location);
+                               url.searchParams.set('post', slug);
+                               window.history.pushState({}, '', url);
+                               setPage(<Component />);
                                return; // Don't add to interps
                            }
 
