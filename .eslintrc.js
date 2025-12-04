@@ -1,6 +1,38 @@
 module.exports = {
-    "extends": "airbnb"
-    // "rules": {
-    //     "consistent-return": "off"
-    // }
+    "extends": [
+        "airbnb",
+        "plugin:@next/next/recommended"
+    ],
+    "rules": {
+        "consistent-return": "off",
+        "indent": ["error", 4],
+        "react/jsx-indent": ["error", 4],
+        "react/jsx-indent-props": ["error", 4],
+        "quotes": "off",
+        "react/prop-types": "off",
+        "react/react-in-jsx-scope": "off",
+        "react/jsx-filename-extension": "off",
+        "react/jsx-props-no-spreading": "off",
+        "import/newline-after-import": "off",
+        "object-curly-spacing": "off",
+        "key-spacing": "off",
+        "prefer-const": "off",
+        "no-plusplus": "off",
+        "prefer-destructuring": "off",
+        "arrow-body-style": "off",
+        "operator-linebreak": "off",
+        "react/no-array-index-key": "off",
+        "react/self-closing-comp": "off",
+        "no-multiple-empty-lines": "off",
+        "import/no-named-as-default": "off",
+        "import/no-named-as-default-member": "off",
+        "no-unused-vars": "off",
+        "comma-dangle": "off",
+        "arrow-parens": "off",
+        "react/forbid-prop-types": "off",
+        "react/no-unescaped-entities": "off",
+        "jsx-a11y/anchor-is-valid": "off",
+        "jsx-a11y/click-events-have-key-events": "off",
+        "jsx-a11y/no-static-element-interactions": "off"
+    }
 };

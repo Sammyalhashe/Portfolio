@@ -1,4 +1,20 @@
 @import 'https://fonts.googleapis.com/css?family=Source+Code+Pro&display=swap';
+
+:root {
+  --bg-color: black;
+  --text-color: white;
+  --prompt-color: red;
+  --info-color: green;
+  --highlight-color: orange;
+  --highlight-info-color: cyan;
+  --error-color: red;
+  --link-color: red;
+  --link-bg-color: blue;
+  --link-hover-bg-color: yellow;
+  --modal-bg-color: black;
+  --modal-border-color: green;
+}
+
 html {
   scrollbar-width: none; /* For Firefox */
   -ms-overflow-style: none; /* For Internet Explorer and Edge */
@@ -9,10 +25,10 @@ html::-webkit-scrollbar {
 }
 
 body {
-  background: black;
+  background: var(--bg-color);
   background-repeat: repeat;
   font-family: 'Source Code Pro', monospace;
-  color: white;
+  color: var(--text-color);
 }
 
 .main {
@@ -25,7 +41,7 @@ body {
 
 .prompt {
   display: inline-block;
-  color: red;
+  color: var(--prompt-color);
   padding-top: 5px;
   padding-left: 5px;
 }
@@ -44,28 +60,28 @@ body {
 
 .info {
   padding: 10px;
-  color: green;
+  color: var(--info-color);
 }
 
 .info .highlighted-info {
-  color: cyan;
+  color: var(--highlight-info-color);
 }
 
 .highlight {
-  color: orange;
+  color: var(--highlight-color);
 }
 
 .error {
-  color: red;
+  color: var(--error-color);
 }
 
 .project-link {
-  color: red;
-  background-color: blue;
+  color: var(--link-color);
+  background-color: var(--link-bg-color);
 }
 
 .project-link:hover {
-  background-color: yellow;
+  background-color: var(--link-hover-bg-color);
 }
 
 @media only screen and (max-width: 480px) {
@@ -99,9 +115,108 @@ body {
 .longinfo {
   word-wrap: anywhere;
   padding: 10px;
-  color: green;
+  color: var(--info-color);
 }
 
 .shellContainer {
     overflow: hidden;
+}
+
+.ls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: var(--modal-bg-color);
+  border: 1px solid var(--modal-border-color);
+  width: 75%;
+  height: 75%;
+  overflow-y: auto;
+  padding: 20px;
+  position: relative;
+  color: var(--text-color);
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: red;
+  color: white;
+  border: none;
+  cursor: pointer;
+  padding: 5px 10px;
+  font-family: inherit;
+  font-weight: bold;
+}
+
+.page-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-color);
+  z-index: 2000;
+  overflow-y: auto;
+  padding: 20px;
+  box-sizing: border-box;
+  color: var(--text-color);
+}
+
+.page-close-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: red;
+  color: white;
+  border: none;
+  cursor: pointer;
+  padding: 10px 20px;
+  font-family: inherit;
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+.page-content-wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+  padding-top: 60px;
+}
+
+.theme-switcher-container {
+    position: absolute;
+    top: 20px;
+    right: 80px; /* Space for close button */
+    z-index: 2001;
+}
+
+.theme-select {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border: 1px solid var(--modal-border-color);
+    padding: 5px;
+    font-family: inherit;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+.theme-select:focus {
+    outline: none;
+    border-color: var(--highlight-color);
 }

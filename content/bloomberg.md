@@ -1,6 +1,7 @@
 ---
 title: My role at Bloomberg
 date: 2025-03-01
+type: experience
 lessons: [c++, python bindings, lock-free, middleware programming]
 ---
 

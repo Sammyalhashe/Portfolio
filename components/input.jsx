@@ -45,7 +45,7 @@ function Input({ cmdFunction, results, handleEnter }) {
   return (
     <div>
       <span className="prompt prompt-lg">
-        sammyalhashemi1@outlook.com$&nbsp;
+        sammy@salh.xyz$&nbsp;
       </span>
       <span className="prompt prompt-sm">$ </span>
       <span className="prompt-input">

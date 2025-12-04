@@ -1,5 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
+import postMap from './post_loader';
+
 const projects = [
   {
     name: 'atp-scraper',
@@ -28,6 +30,7 @@ const projects = [
   },
 ];
 
+// Fallback hardcoded work terms if needed, but exps command now uses postMap
 const work_terms = [
   {
     name: 'Morgan-Stanley',
@@ -62,6 +65,22 @@ const cmds = {
         </div>
         <div className="info">
           Enter <span className="highlight">"ls"</span> to see everything in the directory that you can interact with
+        </div>
+        <div className="info">
+          Enter <span className="highlight">"posts"</span> to see my blog posts
+        </div>
+        <div className="info">
+          Enter <span className="highlight">"right"</span> to split the terminal to the right
+        </div>
+        <div className="info">
+          Enter <span className="highlight">"down"</span> to split the terminal down
+        </div>
+        <div className="info">
+          Enter <span className="highlight">"conf"</span> to configure the terminal
+          <br/>
+          Usage: <span className="highlight">conf blogView:&lt;inline/popup/page&gt;</span> or <span className="highlight">conf theme:&lt;theme&gt;</span>
+          <br/>
+          Supported themes: default, gruvbox, nord, nord light, github dark, github light
         </div>
         <div className="info">
             Enter <span className="highlight">"coffee"</span> to send a tip if you want :)
@@ -111,7 +130,7 @@ const cmds = {
           Phone: <span className="info highlighted-info">647-463-2638</span>
           Email:{' '}
           <span className="info highlighted-info">
-            sammyalhashemi1@outlook.com
+            sammy@salh.xyz
           </span>
         </div>
       </div>
@@ -164,16 +183,152 @@ const cmds = {
     return <div className="output">{projs}</div>;
   },
   ls: (unused, cb) => {
-    const all_things_to_see = [cmds.resume(true), cmds.project(undefined, cb), cmds.exps("", cb)];
+    // 1. Resume
+    const resume = cmds.resume(true);
+
+    // 2. Projects
+    const projs = projects.map((project, idx) => {
+      const link = () => {
+        if (project.pageLink && cb !== undefined && cb !== null) {
+          return (
+            <a className="project-link" onClick={cb(project.pageLink)}>
+              {project.name}
+            </a>
+          );
+        } else {
+          return (
+            <a className="project-link" target="_blank" href={project.link}>
+              {project.name}
+            </a>
+          );
+        }
+      };
+      return (
+        <span key={'proj-' + idx} className="info">
+          {link()}
+        </span>
+      );
+    });
+
+    // 3. Work Terms (Experiments/Experience)
+    // Filter postMap for experiences
+    const expLinks = Object.keys(postMap)
+        .filter(slug => postMap[slug].attributes.type === 'experience')
+        .map((slug, idx) => {
+            const attributes = postMap[slug].attributes;
+            const link = () => {
+                if (cb !== undefined && cb !== null) {
+                    return (
+                        <a className="project-link" onClick={cb('/post/' + slug)}>
+                            {attributes.title || slug}
+                        </a>
+                    );
+                } else {
+                    return (
+                        <span className="project-link">{attributes.title || slug}</span>
+                    );
+                }
+            };
+            return (
+                <span key={'exp-' + idx} className="info">
+                    {link()}
+                </span>
+            );
+        });
+
+    // 4. Posts
+    // Filter postMap for non-experiences (posts)
+    const postLinks = Object.keys(postMap)
+        .filter(slug => postMap[slug].attributes.type !== 'experience')
+        .map((slug, idx) => {
+            const attributes = postMap[slug].attributes;
+            const link = () => {
+                if (cb !== undefined && cb !== null) {
+                    return (
+                        <a className="project-link" onClick={cb('/post/' + slug)}>
+                            {attributes.title || slug}
+                        </a>
+                    );
+                } else {
+                    return (
+                        <span className="project-link">{attributes.title || slug}</span>
+                    );
+                }
+            };
+            return (
+                <span key={'post-' + idx} className="info">
+                    {link()}
+                </span>
+            );
+        });
+
+
     return (
-        <div className="wrapper">
-            {
-                all_things_to_see.map((thing, idx) => {
-                    return <span key={idx}>{thing}</span>;
-                })
-            }
-        </div>
+      <div className="output ls-grid">
+        {resume}
+        {projs}
+        {expLinks}
+        {postLinks}
+      </div>
     );
+  },
+  posts: (unused, cb) => {
+    const postLinks = Object.keys(postMap)
+        .filter(slug => postMap[slug].attributes.type !== 'experience')
+        .map((slug) => {
+          const attributes = postMap[slug].attributes;
+
+          const link = () => {
+            if (cb !== undefined && cb !== null) {
+              return (
+                <a className="project-link" onClick={cb('/post/' + slug)}>
+                  {attributes.title || slug}
+                </a>
+              );
+            } else {
+              return (
+                 <span className="project-link">{attributes.title || slug}</span>
+              );
+            }
+          };
+
+          return (
+            <div key={slug} className="info">
+              {link()}
+            </div>
+          );
+        });
+
+    return <div className="output">{postLinks}</div>;
+  },
+  exps: (flag, cb) => {
+     const expLinks = Object.keys(postMap)
+        .filter(slug => postMap[slug].attributes.type === 'experience')
+        .map((slug) => {
+          const attributes = postMap[slug].attributes;
+
+          const link = () => {
+            if (cb !== undefined && cb !== null) {
+              return (
+                <a className="project-link" onClick={cb('/post/' + slug)}>
+                  {attributes.title || slug}
+                </a>
+              );
+            } else {
+              return (
+                 <span className="project-link">{attributes.title || slug}</span>
+              );
+            }
+          };
+
+          return (
+            <div key={slug} className="info">
+              {link()}
+            </div>
+          );
+        });
+
+    return <div className="output">{expLinks}</div>;
   },
   old: () => {
     const a = document.createElement('a');
@@ -225,63 +380,6 @@ const cmds = {
         <img src="/collision_pic.jpg" alt="A picture of me" />
       </div>
     );
-  },
-  exps: (flag, cb) => {
-    if (flag.length === 0) {
-      return (
-        <div>
-          {work_terms.map((term, idx) => {
-            if (cb !== undefined && cb !== null) {
-                return (
-                  <span key={term + idx} className="info">
-                    <a className="project-link" onClick={cb(term.file)}>
-                      {term.name}
-                    </a>
-                  </span>
-                );
-            }
-            else {
-                return (
-                  <span key={term + idx} className="info">
-                    <a className="project-link" href={term.file}>
-                      {term.name}
-                    </a>
-                  </span>
-                );
-            }
-          })}
-        </div>
-      );
-    } else {
-      if (flag.length !== 1 || flag[0].length <= 2) {
-        return null;
-      }
-      if (flag[0].substr(0, 2) !== '--') {
-        console.log(flag[0].substr(0, 2));
-        return null;
-      }
-      const modifiedFlag = flag[0]
-        .substr(2)
-        .toLowerCase()
-        .trim();
-      const ioa = inObjectArray(work_terms, 'name', modifiedFlag);
-      if (ioa[0]) {
-        return (
-          <span className="info">
-            <Link className="project-link" href={work_terms[ioa[1]].file}>
-              {work_terms[ioa[1]].name}
-            </Link>
-          </span>
-        );
-      } else {
-        return (
-          <div className="output error">
-            Undefined project: &nbsp;
-            {flag[0]}
-          </div>
-        );
-      }
-    }
   },
   budg: () => {
     return (

@@ -1,6 +1,7 @@
 ---
 title: My time at Morgan Stanley as a Software Engineer
 date: 2020-03-22T19:10:40.429Z
+type: experience
 lessons: []
 ---
 
