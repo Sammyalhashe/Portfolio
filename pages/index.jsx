@@ -13,6 +13,8 @@ function HomePage() {
   useEffect(() => {
     // Detect theme on mount
     renderTree.detectTheme();
+    // Inject neofetch after theme detection
+    renderTree.injectNeofetch();
 
     if (router.isReady && router.query.post) {
       const slug = router.query.post;

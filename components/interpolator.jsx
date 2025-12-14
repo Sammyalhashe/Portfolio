@@ -5,6 +5,13 @@ function Interpolator({ interpolatedResults }) {
     const mappedResults = interpolatedResults.map((res, index) => {
         const ind = res.cmd + res.result + index;
         const cmd = res.cmd;
+        if (cmd === null) {
+          return (
+            <div key={ind} style={{ width: "auto" }}>
+                <div>{res.result}</div>
+            </div>
+          );
+        }
         return (
             <div key={ind} style={{ width: (cmd === "budg") ? "100%" : "auto" }}>
                 <span className="prompt prompt-lg">

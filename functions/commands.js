@@ -119,7 +119,7 @@ const cmds = {
           <br />
           Phone:
           <span className="info highlighted-info">
-            <Typewriter text="647-463-2638" />
+            <Typewriter text="(917) 846-6665" />
           </span>
           Email:
           {' '}
