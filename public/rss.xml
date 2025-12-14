@@ -9,12 +9,28 @@
             <link>https://salh.xyz</link>
         </image>
         <generator>RSS for Node</generator>
-        <lastBuildDate>Sun, 14 Dec 2025 05:47:13 GMT</lastBuildDate>
+        <lastBuildDate>Sun, 14 Dec 2025 06:49:39 GMT</lastBuildDate>
         <atom:link href="https://salh.xyz/rss.xml" rel="self" type="application/rss+xml"/>
         <copyright><![CDATA[Copyright 2025 Sammy Al Hashemi]]></copyright>
         <language><![CDATA[en]]></language>
         <managingEditor><![CDATA[sammy@salh.xyz (Sammy Al Hashemi)]]></managingEditor>
         <webMaster><![CDATA[sammy@salh.xyz (Sammy Al Hashemi)]]></webMaster>
+        <item>
+            <title><![CDATA[Crypto Trader Part 2]]></title>
+            <description><![CDATA[A post from Notes from the Terminal]]></description>
+            <link>https://salh.xyz/?post=posts/crypto-trader-2</link>
+            <guid isPermaLink="false">crypto-trader-2.md</guid>
+            <dc:creator><![CDATA[Sammy Al Hashemi]]></dc:creator>
+            <pubDate>Sat, 06 Dec 2025 00:00:00 GMT</pubDate>
+        </item>
+        <item>
+            <title><![CDATA[Crypto Trader Part 1]]></title>
+            <description><![CDATA[A post from Notes from the Terminal]]></description>
+            <link>https://salh.xyz/?post=posts/crypto-trader-1</link>
+            <guid isPermaLink="false">crypto-trader-1.md</guid>
+            <dc:creator><![CDATA[Sammy Al Hashemi]]></dc:creator>
+            <pubDate>Fri, 05 Dec 2025 00:00:00 GMT</pubDate>
+        </item>
         <item>
             <title><![CDATA[My First Post]]></title>
             <description><![CDATA[A post from Notes from the Terminal]]></description>
