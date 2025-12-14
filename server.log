@@ -32,3 +32,9 @@ Warning: Input: Support for defaultProps will be removed from function component
  GET / 200 in 7334ms
  GET / 200 in 221ms
  GET / 200 in 349ms
+ ✓ Compiled in 2.8s (426 modules)
+ GET / 200 in 511ms
+ GET / 200 in 308ms
+ GET / 200 in 224ms
+ GET / 200 in 267ms
+ GET / 200 in 224ms

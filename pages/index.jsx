@@ -109,6 +109,19 @@ function HomePage() {
                 return;
             }
 
+            // Direct Alt shortcuts for tab navigation
+            if (e.altKey && e.key === '[') {
+                e.preventDefault();
+                renderTree.handleTabPrev();
+                return;
+            }
+
+            if (e.altKey && e.key === ']') {
+                e.preventDefault();
+                renderTree.handleTabNext();
+                return;
+            }
+
             if (waitingForTabCmd) {
                 e.preventDefault();
                 setWaitingForTabCmd(false); // Reset state
