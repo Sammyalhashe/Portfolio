@@ -70,5 +70,7 @@ module.exports = {
     'max-classes-per-file': 0,
     'react/no-unescaped-entities': 0,
     'no-console': 0,
+    'prefer-destructuring': 0,
+    'react/jsx-closing-tag-location': 0,
   },
 };

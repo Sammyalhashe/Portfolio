@@ -56,7 +56,7 @@ function Shell({
             result
         ) : (
             <div className="output error">
-            Command&nbsp;is not valid:&nbsp;
+                Command&nbsp;is not valid:&nbsp;
                 {cmd}
             </div>
         )
@@ -83,18 +83,27 @@ function Shell({
             const arg = cmdarr[1];
             if (arg === 'new') {
                 windowTree.handleTabNew();
-                const cmdRes = buildCmdRes(cmdarr.join(' '), <div className="output info">New tab created</div>);
+                const cmdRes = buildCmdRes(
+                    cmdarr.join(' '),
+                    <div className="output info">New tab created</div>
+                );
                 setInterps([...interps, cmdRes]);
                 setLegacyInterps([...legacyInterps, cmdRes]);
             } else if (arg === 'close') {
                 windowTree.handleTabClose();
                 // If we closed the current tab, this component might unmount,
                 // but if we are still here (e.g. only 1 tab left), show msg.
-                const cmdRes = buildCmdRes(cmdarr.join(' '), <div className="output info">Tab closed</div>);
+                const cmdRes = buildCmdRes(
+                    cmdarr.join(' '),
+                    <div className="output info">Tab closed</div>
+                );
                 setInterps([...interps, cmdRes]);
                 setLegacyInterps([...legacyInterps, cmdRes]);
             } else {
-                const cmdRes = buildCmdRes(cmdarr.join(' '), <div className="output error">Usage: tab &lt;new/close&gt;</div>);
+                const cmdRes = buildCmdRes(
+                    cmdarr.join(' '),
+                    <div className="output error">Usage: tab &lt;new/close&gt;</div>
+                );
                 setInterps([...interps, cmdRes]);
                 setLegacyInterps([...legacyInterps, cmdRes]);
             }
@@ -104,27 +113,42 @@ function Shell({
                 const mode = arg.split(':')[1];
                 if (mode === 'inline' || mode === 'popup' || mode === 'page' || mode === 'tab') {
                     setBlogView(mode);
-                    const cmdRes = buildCmdRes(cmdarr.join(' '), <div className="output info">Blog view set to {mode}</div>);
+                    const cmdRes = buildCmdRes(
+                        cmdarr.join(' '),
+                        <div className="output info">Blog view set to {mode}</div>
+                    );
                     setInterps([...interps, cmdRes]);
                     setLegacyInterps([...legacyInterps, cmdRes]);
                 } else {
-                    const cmdRes = buildCmdRes(cmdarr.join(' '), <div className="output error">Invalid mode. Use inline, popup, page, or tab</div>);
+                    const cmdRes = buildCmdRes(
+                        cmdarr.join(' '),
+                        <div className="output error">Invalid mode. Use inline, popup, page, or tab</div>
+                    );
                     setInterps([...interps, cmdRes]);
                     setLegacyInterps([...legacyInterps, cmdRes]);
                 }
             } else if (arg && arg.startsWith('theme:')) {
                 const themeName = cmdarr.slice(1).join(' ').replace('theme:', '');
                 if (setTheme(themeName)) {
-                    const cmdRes = buildCmdRes(cmdarr.join(' '), <div className="output info">Theme set to {themeName}</div>);
+                    const cmdRes = buildCmdRes(
+                        cmdarr.join(' '),
+                        <div className="output info">Theme set to {themeName}</div>
+                    );
                     setInterps([...interps, cmdRes]);
                     setLegacyInterps([...legacyInterps, cmdRes]);
                 } else {
-                    const cmdRes = buildCmdRes(cmdarr.join(' '), <div className="output error">Invalid theme. Check help for options</div>);
+                    const cmdRes = buildCmdRes(
+                        cmdarr.join(' '),
+                        <div className="output error">Invalid theme. Check help for options</div>
+                    );
                     setInterps([...interps, cmdRes]);
                     setLegacyInterps([...legacyInterps, cmdRes]);
                 }
             } else {
-                const cmdRes = buildCmdRes(cmdarr.join(' '), <div className="output error">Usage: conf blogView:&lt;inline/popup/page/tab&gt; or conf theme:&lt;theme&gt;</div>);
+                const cmdRes = buildCmdRes(
+                    cmdarr.join(' '),
+                    <div className="output error">Usage: conf blogView:&lt;mode&gt; or conf theme:&lt;theme&gt;</div>
+                );
                 setInterps([...interps, cmdRes]);
                 setLegacyInterps([...legacyInterps, cmdRes]);
             }
@@ -299,7 +323,7 @@ function Shell({
                     cmdRes = buildCmdRes(
                         cmdarr.join(' '),
                         <div className="output error">
-              Command&nbsp;not found:&nbsp;
+                            Command&nbsp;not found:&nbsp;
                             {cmd}
                         </div>
                     );
@@ -316,7 +340,14 @@ function Shell({
     return (
         <div
             ref={shellRef}
-            style={{ width: '100%', height: '100%', overflowY: 'scroll', paddingRight: '17px', boxSizing: 'content-box', border: isFocused ? '1px solid var(--info-color)' : 'none' }}
+            style={{
+                width: '100%',
+                height: '100%',
+                overflowY: 'scroll',
+                paddingRight: '17px',
+                boxSizing: 'content-box',
+                border: isFocused ? '1px solid var(--info-color)' : 'none'
+            }}
             className={`shell ${isFocused ? 'focused' : ''}`}
             id={shellId}
             onClick={onFocus}
