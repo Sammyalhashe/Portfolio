@@ -401,6 +401,7 @@ class WindowTree {
                     setModal={this.setModal}
                     setPage={this.setPage}
                     setTheme={this.setTheme}
+                    theme={this.theme}
                 />
             );
         }

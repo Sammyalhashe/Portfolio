@@ -21,7 +21,7 @@ const StringToPageComponents = {
     "Bloomberg": Bloomberg
 };
 
-function Shell({ nodeId, splitHandle, removeHandle, interps, setInterps, legacyInterps, setLegacyInterps, blogView, setBlogView, setModal, setPage, setTheme }) {
+function Shell({ nodeId, splitHandle, removeHandle, interps, setInterps, legacyInterps, setLegacyInterps, blogView, setBlogView, setModal, setPage, setTheme, theme }) {
   const shellId = nodeId;
   const shellRef = useRef(null);
 
@@ -98,7 +98,9 @@ function Shell({ nodeId, splitHandle, removeHandle, interps, setInterps, legacyI
       const f = cmds[cmd.toLowerCase()];
       if (f !== undefined && f !== null) {
         let result;
-        if (cmd.toLowerCase() === "exps" || cmd.toLowerCase() === "ls" || cmd.toLowerCase() === "project" || cmd.toLowerCase() === "posts") {
+        if (cmd.toLowerCase() === "neofetch") {
+            result = f(null, null, { theme });
+        } else if (cmd.toLowerCase() === "exps" || cmd.toLowerCase() === "ls" || cmd.toLowerCase() === "project" || cmd.toLowerCase() === "posts") {
             result = f("", x => {
                 const a = x.slice(1); // remove the '/'
                 return y => {
@@ -177,10 +179,12 @@ function Shell({ nodeId, splitHandle, removeHandle, interps, setInterps, legacyI
     }
   };
 
+  const commandList = Object.keys(cmds).concat(['clear', 'right', 'down', 'exit', 'conf']);
+
   return (
       <div ref={shellRef} style={{width: '100%', height: '100%', overflowY: 'scroll', paddingRight: '17px', boxSizing: 'content-box'}} className="shell" id={shellId}>
       <Interpolator interpolatedResults={interps} />
-      <Input cmdFunction={applyCmd} results={legacyInterps} handleEnter={handleEnter} />
+      <Input cmdFunction={applyCmd} results={legacyInterps} handleEnter={handleEnter} suggestions={commandList} />
     </div>
   );
 }
