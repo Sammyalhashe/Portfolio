@@ -112,18 +112,28 @@ function Shell({ nodeId, splitHandle, removeHandle, interps, setInterps, legacyI
                         const Post = postMap[slug];
                         if (Post) {
                            const { attributes, react: Content } = Post;
-                           Component = () => {
-                               useEffect(() => {
-                                   Prism.highlightAll();
-                               }, []);
-                               return (
-                                 <div>
-                                   <h1>{attributes.title}</h1>
-                                   <h2>{attributes.date}</h2>
-                                   <Content />
-                                 </div>
-                               );
-                           };
+                           if (typeof Content === 'function') {
+                                Component = () => {
+                                    useEffect(() => {
+                                        Prism.highlightAll();
+                                    }, []);
+                                    return (
+                                    <div>
+                                        <h1>{attributes.title}</h1>
+                                        <h2>{attributes.date}</h2>
+                                        <Content />
+                                    </div>
+                                    );
+                                };
+                           } else {
+                                Component = () => (
+                                    <div>
+                                        <h1>{attributes.title}</h1>
+                                        <h2>{attributes.date}</h2>
+                                        <p className="error">Error: Post content format is invalid.</p>
+                                    </div>
+                                );
+                           }
                            if (blogView === 'popup') {
                                setModal(<Component />);
                                return;
@@ -161,7 +171,7 @@ function Shell({ nodeId, splitHandle, removeHandle, interps, setInterps, legacyI
                 args = cmdarr.slice(1);
             }
 
-            result = f(args, x => {
+            const navCallback = x => {
                 const a = x.slice(1); // remove the '/'
                 return y => {
                     let Component;
@@ -183,32 +193,42 @@ function Shell({ nodeId, splitHandle, removeHandle, interps, setInterps, legacyI
                            const Navigation = () => (
                                <div style={{ marginTop: '40px', display: 'flex', justifyContent: 'space-between', borderTop: '1px solid gray', paddingTop: '20px' }}>
                                    {prevSlug ? (
-                                       <a className="project-link" style={{cursor: 'pointer'}} onClick={y('/post/' + prevSlug)}>
+                                       <a className="project-link" style={{cursor: 'pointer'}} onClick={navCallback('/post/' + prevSlug)}>
                                            &larr; {postMap[prevSlug].attributes.title}
                                        </a>
                                    ) : <span />}
 
                                    {nextSlug ? (
-                                       <a className="project-link" style={{cursor: 'pointer'}} onClick={y('/post/' + nextSlug)}>
+                                       <a className="project-link" style={{cursor: 'pointer'}} onClick={navCallback('/post/' + nextSlug)}>
                                            {postMap[nextSlug].attributes.title} &rarr;
                                        </a>
                                    ) : <span />}
                                </div>
                            );
 
-                           Component = () => {
-                             useEffect(() => {
-                                 Prism.highlightAll();
-                             }, []);
-                             return (
-                               <div>
-                                 <h1>{attributes.title}</h1>
-                                 <h2>{attributes.date}</h2>
-                                 <Content />
-                                 <Navigation />
-                               </div>
-                             );
-                           };
+                           if (typeof Content === 'function') {
+                                Component = () => {
+                                    useEffect(() => {
+                                        Prism.highlightAll();
+                                    }, []);
+                                    return (
+                                    <div>
+                                        <h1>{attributes.title}</h1>
+                                        <h2>{attributes.date}</h2>
+                                        <Content />
+                                        <Navigation />
+                                    </div>
+                                    );
+                                };
+                           } else {
+                                Component = () => (
+                                    <div>
+                                        <h1>{attributes.title}</h1>
+                                        <h2>{attributes.date}</h2>
+                                        <p className="error">Error: Post content format is invalid.</p>
+                                    </div>
+                                );
+                           }
 
                            // Handle popup mode for posts
                            if (blogView === 'popup') {
@@ -241,7 +261,8 @@ function Shell({ nodeId, splitHandle, removeHandle, interps, setInterps, legacyI
                     setInterps([...interps, cmdRes]);
                     setLegacyInterps([...legacyInterps, cmdRes]);
                 };
-            });
+            };
+            result = f(args, navCallback);
         }
         else if (f.length > 0) {
           result = f(cmdarr.slice(1));
