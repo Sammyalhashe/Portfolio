@@ -290,17 +290,145 @@ const cmds = {
         filterTag = args[1];
     }
 
-    const postLinks = Object.keys(postMap)
-      .filter(slug => slug.startsWith('posts/'))
-      .filter(slug => {
-          if (!filterTag) return true;
-          const attributes = postMap[slug].attributes;
-          return attributes.tags && attributes.tags.includes(filterTag);
-      })
-      .map((slug) => {
+    // Handling "posts --series <seriesname>"
+    let filterSeries = null;
+    if (args && args.length >= 2 && args[0] === '--series') {
+        filterSeries = args.slice(1).join(" ");
+    }
+
+    // Get all post slugs
+    let postSlugs = Object.keys(postMap).filter(slug => slug.startsWith('posts/'));
+
+    // If filtering by series, show only posts in that series sorted by order
+    if (filterSeries) {
+        const seriesPosts = postSlugs
+            .filter(slug => {
+                const attrs = postMap[slug].attributes;
+                return attrs.series === filterSeries;
+            })
+            .sort((a, b) => {
+                const orderA = postMap[a].attributes.seriesOrder || 999;
+                const orderB = postMap[b].attributes.seriesOrder || 999;
+                return orderA - orderB;
+            })
+            .map(slug => {
+                const attributes = postMap[slug].attributes;
+                const readingTime = attributes.readingTime || "";
+                const link = () => {
+                    if (cb !== undefined && cb !== null) {
+                        return (
+                          <a className="project-link" onClick={cb('/post/' + slug)}>
+                            {attributes.title || slug.split('/')[1]}
+                          </a>
+                        );
+                    } else {
+                        return (
+                          <span className="project-link">{attributes.title || slug.split('/')[1]}</span>
+                        );
+                    }
+                };
+                return (
+                    <div key={slug} className="info">
+                        {link()} <span style={{opacity: 0.7, fontSize: '0.9em', marginLeft: '10px'}}>{readingTime}</span>
+                    </div>
+                );
+            });
+
+        if (seriesPosts.length === 0) {
+            return <div className="output info">No posts found in series "{filterSeries}".</div>;
+        }
+
+        return (
+            <div className="output">
+                <div className="info">Series: <span className="highlight">{filterSeries}</span></div>
+                {seriesPosts}
+            </div>
+        );
+    }
+
+    // If filtering by tag, keep logic similar
+    if (filterTag) {
+        const postLinks = postSlugs
+            .filter(slug => {
+                const attributes = postMap[slug].attributes;
+                return attributes.tags && attributes.tags.includes(filterTag);
+            })
+            .map((slug) => {
+                const attributes = postMap[slug].attributes;
+                const readingTime = attributes.readingTime || "";
+                const link = () => {
+                    if (cb !== undefined && cb !== null) {
+                        return (
+                          <a className="project-link" onClick={cb('/post/' + slug)}>
+                            {attributes.title || slug.split('/')[1]}
+                          </a>
+                        );
+                    } else {
+                        return (
+                          <span className="project-link">{attributes.title || slug.split('/')[1]}</span>
+                        );
+                    }
+                };
+                return (
+                    <div key={slug} className="info">
+                        {link()} <span style={{opacity: 0.7, fontSize: '0.9em', marginLeft: '10px'}}>{readingTime}</span>
+                    </div>
+                );
+            });
+         if (postLinks.length === 0) return <div className="output info">No posts found with tag "{filterTag}".</div>;
+         return <div className="output">{postLinks}</div>;
+    }
+
+    // Default view: Group by series
+    const seriesMap = {};
+    const standalonePosts = [];
+
+    postSlugs.forEach(slug => {
+        const attrs = postMap[slug].attributes;
+        if (attrs.series) {
+            if (!seriesMap[attrs.series]) {
+                seriesMap[attrs.series] = [];
+            }
+            seriesMap[attrs.series].push(slug);
+        } else {
+            standalonePosts.push(slug);
+        }
+    });
+
+    // Render Series folders
+    const seriesLinks = Object.keys(seriesMap).map(seriesName => {
+        const link = () => {
+            // We need to trigger the command `posts --series <name>`
+            // This is tricky because `cb` typically navigates to a URL.
+            // But usually this shell supports typing commands.
+            // If we can't easily trigger a command via click, we can at least show it.
+            // Alternatively, we can make the onClick fill the input or run the command if supported.
+            // Currently `Shell.jsx` handles input.
+            // For now, let's display it as a directory that requires a command to enter,
+            // or if `cb` allows custom actions.
+            // Looking at `project` command, `cb` takes a string path.
+            // If I return a specialized link...
+
+            // Wait, I can't easily "run" a command from here without `Shell` support.
+            // BUT, users can type `posts --series "Name"`.
+            // Let's just list them and maybe add a helper text or try to make it interactive if possible.
+            // Actually, we can use the `ls` grid style for series.
+            return (
+                 <span className="project-link" style={{color: 'cyan'}}>
+                    [Series] {seriesName}/
+                 </span>
+            );
+        };
+        return (
+            <div key={seriesName} className="info">
+               {link()} <span style={{fontSize: '0.8em', opacity: 0.7}}>(Use: posts --series "{seriesName}")</span>
+            </div>
+        );
+    });
+
+    const postLinks = standalonePosts.map((slug) => {
         const attributes = postMap[slug].attributes;
         const readingTime = attributes.readingTime || "";
-
         const link = () => {
           if (cb !== undefined && cb !== null) {
             return (
@@ -320,13 +448,16 @@ const cmds = {
             {link()} <span style={{opacity: 0.7, fontSize: '0.9em', marginLeft: '10px'}}>{readingTime}</span>
           </div>
         );
-      });
+    });
 
-    if (postLinks.length === 0) {
-        return <div className="output info">No posts found{filterTag ? ` with tag "${filterTag}"` : ""}.</div>;
-    }
-
-    return <div className="output">{postLinks}</div>;
+    return (
+        <div className="output">
+            {seriesLinks.length > 0 && <div className="info" style={{marginBottom: '10px'}}>--- Series ---</div>}
+            {seriesLinks}
+            {postLinks.length > 0 && <div className="info" style={{marginTop: '10px', marginBottom: '10px'}}>--- Posts ---</div>}
+            {postLinks}
+        </div>
+    );
   },
   exps: (flag, cb) => {
     const expLinks = Object.keys(postMap)

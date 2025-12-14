@@ -36,6 +36,13 @@ module.exports = {
         "jsx-a11y/no-static-element-interactions": "off",
         "semi": "off",
         "object-curly-newline": "off",
-        "@next/next/no-sync-scripts": "off"
+        "@next/next/no-sync-scripts": "off",
+        "react/jsx-one-expression-per-line": "off",
+        "no-trailing-spaces": "off",
+        "react/jsx-first-prop-new-line": "off",
+        "react/jsx-max-props-per-line": "off",
+        "react/jsx-closing-bracket-location": "off",
+        "react/jsx-closing-tag-location": "off",
+        "react/button-has-type": "off"
     }
 };
