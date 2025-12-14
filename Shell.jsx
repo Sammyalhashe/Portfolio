@@ -82,23 +82,39 @@ function Shell({
         } else if (cmd.toLowerCase() === 'tab') {
             const arg = cmdarr[1];
             if (arg === 'new') {
-                windowTree.handleTabNew();
-                const cmdRes = buildCmdRes(
-                    cmdarr.join(' '),
-                    <div className="output info">New tab created</div>,
-                );
-                setInterps([...interps, cmdRes]);
-                setLegacyInterps([...legacyInterps, cmdRes]);
+                if (windowTree.handleTabNew()) {
+                    const cmdRes = buildCmdRes(
+                        cmdarr.join(' '),
+                        <div className="output info">New tab created</div>,
+                    );
+                    setInterps([...interps, cmdRes]);
+                    setLegacyInterps([...legacyInterps, cmdRes]);
+                } else {
+                    const cmdRes = buildCmdRes(
+                        cmdarr.join(' '),
+                        <div className="output error">Max tabs reached</div>,
+                    );
+                    setInterps([...interps, cmdRes]);
+                    setLegacyInterps([...legacyInterps, cmdRes]);
+                }
             } else if (arg === 'close') {
-                windowTree.handleTabClose();
-                // If we closed the current tab, this component might unmount,
-                // but if we are still here (e.g. only 1 tab left), show msg.
-                const cmdRes = buildCmdRes(
-                    cmdarr.join(' '),
-                    <div className="output info">Tab closed</div>,
-                );
-                setInterps([...interps, cmdRes]);
-                setLegacyInterps([...legacyInterps, cmdRes]);
+                if (windowTree.handleTabClose()) {
+                    // If we closed the current tab, this component might unmount,
+                    // but if we are still here (e.g. only 1 tab left), show msg.
+                    const cmdRes = buildCmdRes(
+                        cmdarr.join(' '),
+                        <div className="output info">Tab closed</div>,
+                    );
+                    setInterps([...interps, cmdRes]);
+                    setLegacyInterps([...legacyInterps, cmdRes]);
+                } else {
+                    const cmdRes = buildCmdRes(
+                        cmdarr.join(' '),
+                        <div className="output error">Cannot close last tab</div>,
+                    );
+                    setInterps([...interps, cmdRes]);
+                    setLegacyInterps([...legacyInterps, cmdRes]);
+                }
             } else {
                 const cmdRes = buildCmdRes(
                     cmdarr.join(' '),

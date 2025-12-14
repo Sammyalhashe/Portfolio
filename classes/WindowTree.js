@@ -205,6 +205,7 @@ class WindowTree {
         }];
         this.activeTabIndex = 0;
         this.activeNodeId = rootId;
+        this.tabCounter = 1;
 
         // Bind methods to this instance
         this.setBlogView = this.setBlogView.bind(this);
@@ -363,14 +364,20 @@ class WindowTree {
     // --- Tab Management ---
 
     handleTabNew() {
+        if (this.tabs.length >= 9) {
+            // Max tabs reached
+            return null;
+        }
+
         const rootId = uuidv4();
         const newNode = new Node(rootId, null);
         this.shellMap.set(rootId, newNode);
 
+        this.tabCounter += 1;
         const newTab = {
             rootId,
             root: newNode,
-            name: `Tab #${this.tabs.length + 1}`
+            name: `Tab #${this.tabCounter}`
         };
 
         this.tabs.push(newTab);
@@ -398,10 +405,9 @@ class WindowTree {
             }
             this.activeNodeId = this.tabs[this.activeTabIndex].root.nodeId; // Focus remaining tab
             this.context(this.render());
-        } else {
-            // Don't close the last tab, maybe just reset it?
-            // For now, do nothing.
+            return true;
         }
+        return false;
     }
 
     handleTabNext() {
@@ -621,6 +627,22 @@ class WindowTree {
                             {tab.name}
                         </div>
                     ))}
+                    {this.tabs.length < 9 && (
+                        <div
+                            className="tab-item"
+                            onClick={this.handleTabNew}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    this.handleTabNew();
+                                }
+                            }}
+                            title="New Tab"
+                        >
+                            +
+                        </div>
+                    )}
                 </div>
             </div>
         );
