@@ -19,12 +19,12 @@ const StringToPageComponents = {
     PopularMovies,
     Capstone,
     atp_scraper: AtpScraper,
-    Bloomberg
+    Bloomberg,
 };
 
 function Shell({
     nodeId, splitHandle, removeHandle, interps, setInterps, legacyInterps, setLegacyInterps,
-    blogView, setBlogView, setModal, setPage, setTheme, theme, windowTree, isFocused, onFocus
+    blogView, setBlogView, setModal, setPage, setTheme, theme, windowTree, isFocused, onFocus,
 }) {
     const shellId = nodeId;
     const shellRef = useRef(null);
@@ -59,7 +59,7 @@ function Shell({
                 Command&nbsp;is not valid:&nbsp;
                 {cmd}
             </div>
-        )
+        ),
         };
     };
 
@@ -85,7 +85,7 @@ function Shell({
                 windowTree.handleTabNew();
                 const cmdRes = buildCmdRes(
                     cmdarr.join(' '),
-                    <div className="output info">New tab created</div>
+                    <div className="output info">New tab created</div>,
                 );
                 setInterps([...interps, cmdRes]);
                 setLegacyInterps([...legacyInterps, cmdRes]);
@@ -95,14 +95,14 @@ function Shell({
                 // but if we are still here (e.g. only 1 tab left), show msg.
                 const cmdRes = buildCmdRes(
                     cmdarr.join(' '),
-                    <div className="output info">Tab closed</div>
+                    <div className="output info">Tab closed</div>,
                 );
                 setInterps([...interps, cmdRes]);
                 setLegacyInterps([...legacyInterps, cmdRes]);
             } else {
                 const cmdRes = buildCmdRes(
                     cmdarr.join(' '),
-                    <div className="output error">Usage: tab &lt;new/close&gt;</div>
+                    <div className="output error">Usage: tab &lt;new/close&gt;</div>,
                 );
                 setInterps([...interps, cmdRes]);
                 setLegacyInterps([...legacyInterps, cmdRes]);
@@ -115,14 +115,14 @@ function Shell({
                     setBlogView(mode);
                     const cmdRes = buildCmdRes(
                         cmdarr.join(' '),
-                        <div className="output info">Blog view set to {mode}</div>
+                        <div className="output info">Blog view set to {mode}</div>,
                     );
                     setInterps([...interps, cmdRes]);
                     setLegacyInterps([...legacyInterps, cmdRes]);
                 } else {
                     const cmdRes = buildCmdRes(
                         cmdarr.join(' '),
-                        <div className="output error">Invalid mode. Use inline, popup, page, or tab</div>
+                        <div className="output error">Invalid mode. Use inline, popup, page, or tab</div>,
                     );
                     setInterps([...interps, cmdRes]);
                     setLegacyInterps([...legacyInterps, cmdRes]);
@@ -132,14 +132,14 @@ function Shell({
                 if (setTheme(themeName)) {
                     const cmdRes = buildCmdRes(
                         cmdarr.join(' '),
-                        <div className="output info">Theme set to {themeName}</div>
+                        <div className="output info">Theme set to {themeName}</div>,
                     );
                     setInterps([...interps, cmdRes]);
                     setLegacyInterps([...legacyInterps, cmdRes]);
                 } else {
                     const cmdRes = buildCmdRes(
                         cmdarr.join(' '),
-                        <div className="output error">Invalid theme. Check help for options</div>
+                        <div className="output error">Invalid theme. Check help for options</div>,
                     );
                     setInterps([...interps, cmdRes]);
                     setLegacyInterps([...legacyInterps, cmdRes]);
@@ -147,9 +147,7 @@ function Shell({
             } else {
                 const cmdRes = buildCmdRes(
                     cmdarr.join(' '),
-                    <div className="output error">
-                        Usage: conf blogView:&lt;mode&gt; or conf theme:&lt;theme&gt;
-                    </div>
+                    <div className="output error">Usage: conf blogView:&lt;mode&gt; or conf theme:&lt;theme&gt;</div>,
                 );
                 setInterps([...interps, cmdRes]);
                 setLegacyInterps([...legacyInterps, cmdRes]);
@@ -171,18 +169,28 @@ function Shell({
                                 const Post = postMap[slug];
                                 if (Post) {
                                     const { attributes, react: Content } = Post;
-                                    Component = () => {
-                                        useEffect(() => {
-                                            Prism.highlightAll();
-                                        }, []);
-                                        return (
+                                    if (typeof Content === 'function') {
+                                        Component = () => {
+                                            useEffect(() => {
+                                                Prism.highlightAll();
+                                            }, []);
+                                            return (
+                                                <div>
+                                                    <h1>{attributes.title}</h1>
+                                                    <h2>{attributes.date}</h2>
+                                                    <Content />
+                                                </div>
+                                            );
+                                        };
+                                    } else {
+                                        Component = () => (
                                             <div>
                                                 <h1>{attributes.title}</h1>
                                                 <h2>{attributes.date}</h2>
-                                                <Content />
+                                                <p className="error">Error: Post content format is invalid.</p>
                                             </div>
                                         );
-                                    };
+                                    }
                                     if (blogView === 'popup') {
                                         setModal(<Component />);
                                         return;
@@ -205,13 +213,11 @@ function Shell({
                                 Component = StringToPageComponents[a];
                             }
 
-                            const cmdRes = buildCmdRes(cmdarr.join(' '), (() => {
-                                return (
-                                    <div className="output info">
-                                        <Component />
-                                    </div>
-                                );
-                            })());
+                            const cmdRes = buildCmdRes(cmdarr.join(' '), (() => (
+                                <div className="output info">
+                                    <Component />
+                                </div>
+                            ))());
 
                             setInterps([...interps, cmdRes]);
                             setLegacyInterps([...legacyInterps, cmdRes]);
@@ -263,19 +269,29 @@ function Shell({
                                         </div>
                                     );
 
-                                    Component = () => {
-                                        useEffect(() => {
-                                            Prism.highlightAll();
-                                        }, []);
-                                        return (
+                                    if (typeof Content === 'function') {
+                                        Component = () => {
+                                            useEffect(() => {
+                                                Prism.highlightAll();
+                                            }, []);
+                                            return (
+                                                <div>
+                                                    <h1>{attributes.title}</h1>
+                                                    <h2>{attributes.date}</h2>
+                                                    <Content />
+                                                    <Navigation />
+                                                </div>
+                                            );
+                                        };
+                                    } else {
+                                        Component = () => (
                                             <div>
                                                 <h1>{attributes.title}</h1>
                                                 <h2>{attributes.date}</h2>
-                                                <Content />
-                                                <Navigation />
+                                                <p className="error">Error: Post content format is invalid.</p>
                                             </div>
                                         );
-                                    };
+                                    }
 
                                     // Handle popup mode for posts
                                     if (blogView === 'popup') {
@@ -301,13 +317,11 @@ function Shell({
                                 Component = StringToPageComponents[a];
                             }
 
-                            const cmdRes = buildCmdRes(cmdarr.join(' '), (() => {
-                                return (
-                                    <div className="output info">
-                                        <Component />
-                                    </div>
-                                );
-                            })());
+                            const cmdRes = buildCmdRes(cmdarr.join(' '), (() => (
+                                <div className="output info">
+                                    <Component />
+                                </div>
+                            ))());
 
                             setInterps([...interps, cmdRes]);
                             setLegacyInterps([...legacyInterps, cmdRes]);
@@ -354,7 +368,7 @@ function Shell({
                 overflowY: 'scroll',
                 paddingRight: '17px',
                 boxSizing: 'content-box',
-                border: isFocused ? '1px solid var(--info-color)' : 'none'
+                border: isFocused ? '1px solid var(--info-color)' : 'none',
             }}
             className={`shell ${isFocused ? 'focused' : ''}`}
             id={shellId}
