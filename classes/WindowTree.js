@@ -1,3 +1,6 @@
+/* eslint-disable max-classes-per-file */
+/* eslint-disable react/jsx-filename-extension */
+/* eslint-disable no-console */
 import React from 'react';
 import Shell from "../Shell";
 import ProgressBar from "../components/ProgressBar";
@@ -153,15 +156,15 @@ class Node {
             // attach the parent based on the parent direction
             if (this.parent) {
                 switch (oldParentDir) {
-                    case ParentDirection.RIGHT:
-                        this.parent.right = splitNode;
-                        break;
-                    case ParentDirection.LEFT:
-                        this.parent.left = splitNode;
-                        break;
-                    default:
-                        // do nothing, it has no parent
-                        break;
+                case ParentDirection.RIGHT:
+                    this.parent.right = splitNode;
+                    break;
+                case ParentDirection.LEFT:
+                    this.parent.left = splitNode;
+                    break;
+                default:
+                    // do nothing, it has no parent
+                    break;
                 }
             }
 
@@ -178,14 +181,48 @@ class Node {
 }
 
 class WindowTree {
-    shellMap = new Map();
-    blogView = 'page';
-    modalContent = null;
-    pageContent = null;
-    theme = 'default';
-    activeTabIndex = 0;
-    tabs = [];
-    activeNodeId = null;
+    constructor(surroundingContext) {
+        this.shellMap = new Map();
+        this.blogView = 'page';
+        this.modalContent = null;
+        this.pageContent = null;
+        this.theme = 'default';
+        this.activeTabIndex = 0;
+        this.tabs = [];
+        this.activeNodeId = null;
+
+        this.context = surroundingContext;
+
+        // Create initial tab
+        const rootId = uuidv4();
+        const newNode = new Node(rootId, null);
+        this.shellMap.set(rootId, newNode);
+
+        this.tabs = [{
+            rootId,
+            root: newNode,
+            name: 'Tab #1'
+        }];
+        this.activeTabIndex = 0;
+        this.activeNodeId = rootId;
+
+        // Bind methods to this instance
+        this.setBlogView = this.setBlogView.bind(this);
+        this.setModal = this.setModal.bind(this);
+        this.setPage = this.setPage.bind(this);
+        this.setTheme = this.setTheme.bind(this);
+        this.detectTheme = this.detectTheme.bind(this);
+
+        // Bind tab methods
+        this.handleTabNew = this.handleTabNew.bind(this);
+        this.handleTabClose = this.handleTabClose.bind(this);
+        this.handleTabNext = this.handleTabNext.bind(this);
+        this.handleTabPrev = this.handleTabPrev.bind(this);
+        this.handleFocusMove = this.handleFocusMove.bind(this);
+
+        this.modalRef = React.createRef();
+        this.pageRef = React.createRef();
+    }
 
     handleSplitFromId(nodeId, direction) {
         if (this.shellMap.has(nodeId)) {
@@ -200,17 +237,18 @@ class WindowTree {
             this.removeNode(nodeId);
             // reset activeNodeId if it was removed
             if (this.activeNodeId === nodeId) {
-                 this.activeNodeId = this.rootNode.nodeId; // Default to root or traversal logic needed
+                // Default to root or traversal logic needed
+                this.activeNodeId = this.rootNode.nodeId;
             }
             this.context(this.render());
-			console.log(this.printTree());
+            console.log(this.printTree());
         }
     }
 
     handleFocus(nodeId) {
         if (this.activeNodeId !== nodeId) {
-             this.activeNodeId = nodeId;
-             this.context(this.render());
+            this.activeNodeId = nodeId;
+            this.context(this.render());
         }
     }
 
@@ -220,9 +258,9 @@ class WindowTree {
         if (!this.activeNodeId || !this.shellMap.has(this.activeNodeId)) {
             // Focus on root if nothing is active
             if (this.rootNode) {
-                 this.activeNodeId = this.rootNode.nodeId;
-                 // If root is not leaf (it has splits), we need to find a leaf.
-                 // But for simplicity, let's assume it works.
+                this.activeNodeId = this.rootNode.nodeId;
+                // If root is not leaf (it has splits), we need to find a leaf.
+                // But for simplicity, let's assume it works.
             }
             return;
         }
@@ -251,7 +289,8 @@ class WindowTree {
             // Note: In Node.js:
             // insertNewSplit(node, direction):
             //   direction=HORIZONTAL -> split vertically stacked? No.
-            //   Let's check Split enum: HORIZONTAL=0. Usually implies split line is horizontal (top/bottom).
+            //   Let's check Split enum: HORIZONTAL=0. Usually implies split line is horizontal
+            // (top/bottom).
             //   renderTree:
             //     HORIZONTAL: flex-direction: column.
             //       right is child 1 (top?), left is child 2 (bottom?).
@@ -282,8 +321,8 @@ class WindowTree {
 
             if (directionKey === 'k' && splitDir === Split.HORIZONTAL) {
                 if (isLeftChild) { // Am Bottom
-                     targetNode = parent.right; // Go Top
-                     break;
+                    targetNode = parent.right; // Go Top
+                    break;
                 }
             } else if (directionKey === 'j' && splitDir === Split.HORIZONTAL) {
                 if (!isLeftChild) { // Am Top
@@ -329,7 +368,7 @@ class WindowTree {
         this.shellMap.set(rootId, newNode);
 
         const newTab = {
-            rootId: rootId,
+            rootId,
             root: newNode,
             name: `Tab #${this.tabs.length + 1}`
         };
@@ -360,14 +399,15 @@ class WindowTree {
             this.activeNodeId = this.tabs[this.activeTabIndex].root.nodeId; // Focus remaining tab
             this.context(this.render());
         } else {
-             // Don't close the last tab, maybe just reset it?
-             // For now, do nothing.
+            // Don't close the last tab, maybe just reset it?
+            // For now, do nothing.
         }
     }
 
     handleTabNext() {
         this.activeTabIndex = (this.activeTabIndex + 1) % this.tabs.length;
-        this.activeNodeId = this.tabs[this.activeTabIndex].root.nodeId; // Reset focus to root of new tab (or keep track of last focused per tab?)
+        // Reset focus to root of new tab (or keep track of last focused per tab?)
+        this.activeNodeId = this.tabs[this.activeTabIndex].root.nodeId;
         // TODO: track last focused per tab for better UX. For now, root is fine.
         this.context(this.render());
     }
@@ -413,9 +453,9 @@ class WindowTree {
             this.pageContent = content;
             // Update URL if page is closed
             if (!content) {
-                 const url = new URL(window.location);
-                 url.searchParams.delete('post');
-                 window.history.pushState({}, '', url);
+                const url = new URL(window.location);
+                url.searchParams.delete('post');
+                window.history.pushState({}, '', url);
             }
             this.context(this.render());
         }
@@ -425,7 +465,7 @@ class WindowTree {
         if (THEMES[themeName]) {
             this.theme = themeName;
             const theme = THEMES[themeName];
-            Object.keys(theme).forEach(key => {
+            Object.keys(theme).forEach((key) => {
                 document.documentElement.style.setProperty(key, theme[key]);
             });
             this.context(this.render());
@@ -458,40 +498,6 @@ class WindowTree {
         }
     }
 
-    constructor(surroundingContext) {
-        this.context = surroundingContext;
-
-        // Create initial tab
-        const rootId = uuidv4();
-        const newNode = new Node(rootId, null);
-        this.shellMap.set(rootId, newNode);
-
-        this.tabs = [{
-            rootId: rootId,
-            root: newNode,
-            name: "Tab #1"
-        }];
-        this.activeTabIndex = 0;
-        this.activeNodeId = rootId;
-
-        // Bind methods to this instance
-        this.setBlogView = this.setBlogView.bind(this);
-        this.setModal = this.setModal.bind(this);
-        this.setPage = this.setPage.bind(this);
-        this.setTheme = this.setTheme.bind(this);
-        this.detectTheme = this.detectTheme.bind(this);
-
-        // Bind tab methods
-        this.handleTabNew = this.handleTabNew.bind(this);
-        this.handleTabClose = this.handleTabClose.bind(this);
-        this.handleTabNext = this.handleTabNext.bind(this);
-        this.handleTabPrev = this.handleTabPrev.bind(this);
-        this.handleFocusMove = this.handleFocusMove.bind(this);
-
-        this.modalRef = React.createRef();
-        this.pageRef = React.createRef();
-    }
-
     // Backward compatibility getter/setters
     get root() {
         return this.tabs[this.activeTabIndex].root;
@@ -502,7 +508,7 @@ class WindowTree {
     }
 
     get rootId() {
-         return this.tabs[this.activeTabIndex].rootId;
+        return this.tabs[this.activeTabIndex].rootId;
     }
 
     set root(val) {
@@ -532,7 +538,7 @@ class WindowTree {
                     this.root = splitNode;
                 }
             }
-			this.printTree();
+            this.printTree();
             return newNode;
         }
         return null;
@@ -541,8 +547,8 @@ class WindowTree {
     removeNode(targetNodeId) {
         // we shouldn't be able to remove the root Node
         if (this.shellMap.has(targetNodeId) && !(this.rootId === targetNodeId)) {
-			console.log(targetNodeId)
-			this.printTree();
+            console.log(targetNodeId);
+            this.printTree();
             const nodeToRemove = this.shellMap.get(targetNodeId);
             const parent = nodeToRemove.parent;
 
@@ -577,23 +583,23 @@ class WindowTree {
         }
     }
 
-	printTree() {
-		let built = "";
-		let helper = (node) =>  {
-			if (!node) {
-				built += "null";
-				return;
-			}
-			built += "(";
-			built += node.nodeId.toString() + ",";
-			helper(node.left);
-			built += ",";
-			helper(node.right);
-			built += ")";
-		}
-		helper(this.root);
-		return built;
-	}
+    printTree() {
+        let built = '';
+        const helper = (node) => {
+            if (!node) {
+                built += 'null';
+                return;
+            }
+            built += '(';
+            built += `${node.nodeId.toString()},`;
+            helper(node.left);
+            built += ',';
+            helper(node.right);
+            built += ')';
+        };
+        helper(this.root);
+        return built;
+    }
 
     renderTabBar() {
         return (
@@ -604,6 +610,13 @@ class WindowTree {
                             key={tab.rootId}
                             className={`tab-item ${index === this.activeTabIndex ? 'active' : ''}`}
                             onClick={() => this.handleTabSelect(index)}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    this.handleTabSelect(index);
+                                }
+                            }}
                         >
                             {tab.name}
                         </div>
@@ -617,14 +630,14 @@ class WindowTree {
         return (
             <React.Fragment>
                 {this.renderTabBar()}
-                <div className="main-content" style={{height: 'calc(100% - 30px)', position: 'relative'}}>
+                <div className="main-content" style={{ height: 'calc(100% - 30px)', position: 'relative' }}>
                     {this.renderTree(this.rootNode)}
                 </div>
                 {this.modalContent && (
                     <div className="modal-overlay">
                         <div className="modal-content" ref={this.modalRef}>
-                             <ProgressBar targetRef={this.modalRef} />
-                            <button className="close-button" onClick={() => this.setModal(null)}>X</button>
+                            <ProgressBar targetRef={this.modalRef} />
+                            <button type="button" className="close-button" onClick={() => this.setModal(null)}>X</button>
                             {this.modalContent}
                         </div>
                     </div>
@@ -638,12 +651,12 @@ class WindowTree {
                                 value={this.theme}
                                 onChange={(e) => this.setTheme(e.target.value)}
                             >
-                                {Object.keys(THEMES).map(theme => (
+                                {Object.keys(THEMES).map((theme) => (
                                     <option key={theme} value={theme}>{theme}</option>
                                 ))}
                             </select>
                         </div>
-                        <button className="page-close-button" onClick={() => this.setPage(null)}>X</button>
+                        <button type="button" className="page-close-button" onClick={() => this.setPage(null)}>X</button>
                         <div className="page-content-wrapper">
                             {this.pageContent}
                         </div>
@@ -686,20 +699,18 @@ class WindowTree {
         }
         if (node.dirSplit === Split.HORIZONTAL) {
             return (
-                <div key={node.nodeId} style={{overflow: 'hidden', width: '100%', height: '100%', display: "flex", flexDirection: "column"}}>
-                    <div style={{width: '100%', height: '50%', borderBottom: 'solid grey 1px'}} className='shellContainer'>{this.renderTree(node.right)}</div>
-                    <div style={{width: '100%', height: '50%'}} className='shellContainer'>{this.renderTree(node.left)}</div>
-                </div>
-            );
-        } else {
-            return (
-                <div key={node.nodeId} style={{width: '100%', height: '100%', display: "flex", flexDirection: "row"}}>
-                    <div style={{width: '50%', height: '100%', borderRight: 'solid grey 1px'}} className='shellContainer'>{this.renderTree(node.right)}</div>
-                    <div style={{width: '50%', height: '100%'}} className='shellContainer'>{this.renderTree(node.left)}</div>
+                <div key={node.nodeId} style={{ overflow: 'hidden', width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+                    <div style={{ width: '100%', height: '50%', borderBottom: 'solid grey 1px' }} className="shellContainer">{this.renderTree(node.right)}</div>
+                    <div style={{ width: '100%', height: '50%' }} className="shellContainer">{this.renderTree(node.left)}</div>
                 </div>
             );
         }
-
+        return (
+            <div key={node.nodeId} style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'row' }}>
+                <div style={{ width: '50%', height: '100%', borderRight: 'solid grey 1px' }} className="shellContainer">{this.renderTree(node.right)}</div>
+                <div style={{ width: '50%', height: '100%' }} className="shellContainer">{this.renderTree(node.left)}</div>
+            </div>
+        );
     }
 }
 

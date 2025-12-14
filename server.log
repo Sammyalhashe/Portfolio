@@ -34,3 +34,4 @@ Warning: Input: Support for defaultProps will be removed from function component
  ○ Compiling / ...
  ✓ Compiled / in 555ms (438 modules)
  GET / 200 in 937ms
+ ✓ Compiled in 1584ms (288 modules)
