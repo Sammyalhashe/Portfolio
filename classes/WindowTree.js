@@ -1,6 +1,7 @@
 import React from 'react';
 import Shell from "../Shell";
 import ProgressBar from "../components/ProgressBar";
+import cmds from "../functions/commands";
 import { v4 as uuidv4 } from 'uuid';
 
 const Split = {
@@ -178,7 +179,7 @@ class Node {
 
 class WindowTree {
     shellMap = new Map();
-    blogView = 'popup';
+    blogView = 'page';
     modalContent = null;
     pageContent = null;
     theme = 'default';
@@ -239,6 +240,17 @@ class WindowTree {
             } else {
                 this.setTheme('default');
             }
+        }
+    }
+
+    injectNeofetch() {
+        const rootNode = this.shellMap.get(this.rootId);
+        if (rootNode && rootNode.interps.length === 0) {
+            const result = cmds.neofetch(null, null, { theme: this.theme });
+            const cmdRes = { cmd: null, result };
+            rootNode.interps.push(cmdRes);
+            rootNode.legacyInterps.push(cmdRes);
+            this.context(this.render());
         }
     }
 
