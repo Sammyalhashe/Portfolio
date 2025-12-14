@@ -1,5 +1,6 @@
 import React from 'react';
 import Shell from "../Shell";
+import ProgressBar from "../components/ProgressBar";
 import { v4 as uuidv4 } from 'uuid';
 
 const Split = {
@@ -255,6 +256,9 @@ class WindowTree {
         this.setPage = this.setPage.bind(this);
         this.setTheme = this.setTheme.bind(this);
         this.detectTheme = this.detectTheme.bind(this);
+
+        this.modalRef = React.createRef();
+        this.pageRef = React.createRef();
     }
 
     get rootNode() {
@@ -349,14 +353,16 @@ class WindowTree {
                 {this.renderTree(this.root)}
                 {this.modalContent && (
                     <div className="modal-overlay">
-                        <div className="modal-content">
+                        <div className="modal-content" ref={this.modalRef}>
+                             <ProgressBar targetRef={this.modalRef} />
                             <button className="close-button" onClick={() => this.setModal(null)}>X</button>
                             {this.modalContent}
                         </div>
                     </div>
                 )}
                 {this.pageContent && (
-                    <div className="page-overlay">
+                    <div className="page-overlay" ref={this.pageRef}>
+                        <ProgressBar targetRef={this.pageRef} />
                         <div className="theme-switcher-container">
                             <select
                                 className="theme-select"

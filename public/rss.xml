@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title><![CDATA[Notes from the Terminal]]></title>
+        <description><![CDATA[Sammy's Tech Blog]]></description>
+        <link>https://salh.xyz</link>
+        <image>
+            <url>https://salh.xyz/collision_pic.jpg</url>
+            <title>Notes from the Terminal</title>
+            <link>https://salh.xyz</link>
+        </image>
+        <generator>RSS for Node</generator>
+        <lastBuildDate>Sun, 14 Dec 2025 05:47:13 GMT</lastBuildDate>
+        <atom:link href="https://salh.xyz/rss.xml" rel="self" type="application/rss+xml"/>
+        <copyright><![CDATA[Copyright 2025 Sammy Al Hashemi]]></copyright>
+        <language><![CDATA[en]]></language>
+        <managingEditor><![CDATA[sammy@salh.xyz (Sammy Al Hashemi)]]></managingEditor>
+        <webMaster><![CDATA[sammy@salh.xyz (Sammy Al Hashemi)]]></webMaster>
+        <item>
+            <title><![CDATA[My First Post]]></title>
+            <description><![CDATA[A post from Notes from the Terminal]]></description>
+            <link>https://salh.xyz/?post=posts/my-first-post</link>
+            <guid isPermaLink="false">my-first-post.md</guid>
+            <dc:creator><![CDATA[Sammy Al Hashemi]]></dc:creator>
+            <pubDate>Thu, 04 Dec 2025 00:00:00 GMT</pubDate>
+        </item>
+    </channel>
+</rss>

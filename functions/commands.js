@@ -90,6 +90,16 @@ const cmds = {
           <Typewriter text=" to see system info" />
         </div>
         <div className="info">
+            <Typewriter text="Enter " />
+            <span className="highlight">"tags"</span>
+            <Typewriter text=" to see available tags" />
+        </div>
+        <div className="info">
+            <Typewriter text="Enter " />
+            <span className="highlight">"search"</span>
+            <Typewriter text=" to search posts" />
+        </div>
+        <div className="info">
           <Typewriter text="Enter " />
           <span className="highlight">"picture"</span>
           <Typewriter text=" to see a picture of me" />
@@ -217,13 +227,6 @@ const cmds = {
       .filter(slug => slug.startsWith('projects/'))
       .map((slug) => {
         const attributes = postMap[slug].attributes;
-        // Use external link if pageLink not relevant for internal routing via Shell logic?
-        // The old logic used pageLink for internal routing via cb and link for external.
-        // Here, the project markdown can be viewed internally via /post/projects/xxx
-        // OR we can link externally if 'link' attribute is present.
-        // BUT 'projects' command usually listed internal links in the old version if pageLink was present.
-        // We will make them open internally like posts/exps.
-
         const link = () => {
           if (cb !== undefined && cb !== null) {
             return (
@@ -232,8 +235,6 @@ const cmds = {
               </a>
             );
           } else {
-            // If inline (no callback), maybe link to external?
-            // Or just show title.
             return (
               <a className="project-link" href={attributes.link} target="_blank" rel="noreferrer">
                 {attributes.title || slug.split('/')[1]}
@@ -252,10 +253,7 @@ const cmds = {
     return <div className="output">{projLinks}</div>;
   },
   ls: (unused, cb) => {
-    // 1. Resume
     const resume = cmds.resume(true);
-
-    // 2. All items from postMap (projects, exps, posts)
     const allLinks = Object.keys(postMap).map((slug, idx) => {
       const attributes = postMap[slug].attributes;
       const link = () => {
@@ -285,11 +283,23 @@ const cmds = {
       </div>
     );
   },
-  posts: (unused, cb) => {
+  posts: (args, cb) => {
+    // Handling "posts --tag <tagname>"
+    let filterTag = null;
+    if (args && args.length >= 2 && args[0] === '--tag') {
+        filterTag = args[1];
+    }
+
     const postLinks = Object.keys(postMap)
       .filter(slug => slug.startsWith('posts/'))
+      .filter(slug => {
+          if (!filterTag) return true;
+          const attributes = postMap[slug].attributes;
+          return attributes.tags && attributes.tags.includes(filterTag);
+      })
       .map((slug) => {
         const attributes = postMap[slug].attributes;
+        const readingTime = attributes.readingTime || "";
 
         const link = () => {
           if (cb !== undefined && cb !== null) {
@@ -307,10 +317,14 @@ const cmds = {
 
         return (
           <div key={slug} className="info">
-            {link()}
+            {link()} <span style={{opacity: 0.7, fontSize: '0.9em', marginLeft: '10px'}}>{readingTime}</span>
           </div>
         );
       });
+
+    if (postLinks.length === 0) {
+        return <div className="output info">No posts found{filterTag ? ` with tag "${filterTag}"` : ""}.</div>;
+    }
 
     return <div className="output">{postLinks}</div>;
   },
@@ -342,6 +356,73 @@ const cmds = {
       });
 
     return <div className="output">{expLinks}</div>;
+  },
+  tags: () => {
+      const allTags = new Set();
+      Object.keys(postMap).forEach(slug => {
+          if (slug.startsWith('posts/')) {
+              const tags = postMap[slug].attributes.tags;
+              if (Array.isArray(tags)) {
+                  tags.forEach(tag => allTags.add(tag));
+              }
+          }
+      });
+
+      const tagList = Array.from(allTags).map(tag => (
+          <span key={tag} className="info">
+              <span className="project-link">{tag}</span>
+          </span>
+      ));
+
+      if (tagList.length === 0) return <div className="output info">No tags found.</div>;
+
+      return (
+          <div className="output ls-grid">
+              {tagList}
+          </div>
+      );
+  },
+  search: (args, cb) => {
+      if (!args || args.length === 0) {
+          return <div className="output error">Usage: search &lt;query&gt;</div>;
+      }
+      const query = args.join(" ").toLowerCase();
+
+      const results = Object.keys(postMap).filter(slug => {
+          const post = postMap[slug];
+          const title = (post.attributes.title || "").toLowerCase();
+          // We added body in previous steps
+          const body = (post.body || "").toLowerCase();
+
+          return title.includes(query) || body.includes(query);
+      }).map(slug => {
+          const attributes = postMap[slug].attributes;
+          const link = () => {
+            if (cb !== undefined && cb !== null) {
+              return (
+                <a className="project-link" onClick={cb('/post/' + slug)}>
+                  {attributes.title || slug.split('/')[1]}
+                </a>
+              );
+            } else {
+              return (
+                <span className="project-link">{attributes.title || slug.split('/')[1]}</span>
+              );
+            }
+          };
+
+          return (
+            <div key={slug} className="info">
+              {link()}
+            </div>
+          );
+      });
+
+      if (results.length === 0) {
+          return <div className="output info">No matching posts found.</div>;
+      }
+
+      return <div className="output">{results}</div>;
   },
   old: () => {
     const a = document.createElement('a');

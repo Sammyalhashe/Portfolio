@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import Prism from "prismjs";
 import Interpolator from "./components/interpolator";
 import Input from "./components/input";
 import Microsemi from "./pages/Microsemi";
@@ -100,8 +101,67 @@ function Shell({ nodeId, splitHandle, removeHandle, interps, setInterps, legacyI
         let result;
         if (cmd.toLowerCase() === "neofetch") {
             result = f(null, null, { theme });
-        } else if (cmd.toLowerCase() === "exps" || cmd.toLowerCase() === "ls" || cmd.toLowerCase() === "project" || cmd.toLowerCase() === "posts") {
-            result = f("", x => {
+        } else if (cmd.toLowerCase() === "search") {
+            result = f(cmdarr.slice(1), x => {
+                const a = x.slice(1);
+                return y => {
+                    // Similar logic to below, but for search results links
+                     let Component;
+                    if (a.startsWith('post/')) {
+                        const slug = a.replace('post/', '');
+                        const Post = postMap[slug];
+                        if (Post) {
+                           const { attributes, react: Content } = Post;
+                           Component = () => {
+                               useEffect(() => {
+                                   Prism.highlightAll();
+                               }, []);
+                               return (
+                                 <div>
+                                   <h1>{attributes.title}</h1>
+                                   <h2>{attributes.date}</h2>
+                                   <Content />
+                                 </div>
+                               );
+                           };
+                           if (blogView === 'popup') {
+                               setModal(<Component />);
+                               return;
+                           } else if (blogView === 'page') {
+                               const url = new URL(window.location);
+                               url.searchParams.set('post', slug);
+                               window.history.pushState({}, '', url);
+                               setPage(<Component />);
+                               return;
+                           }
+                        } else {
+                            Component = () => <div>Post not found</div>;
+                        }
+                    } else {
+                        Component = StringToPageComponents[a];
+                    }
+
+                    const cmdRes = buildCmdRes(cmdarr.join(" "), (() => {
+                        return (
+                            <div className="output info">
+                                <Component/>
+                            </div>
+                        );
+                    })());
+
+                    setInterps([...interps, cmdRes]);
+                    setLegacyInterps([...legacyInterps, cmdRes]);
+                };
+            });
+        }
+        else if (cmd.toLowerCase() === "exps" || cmd.toLowerCase() === "ls" || cmd.toLowerCase() === "project" || cmd.toLowerCase() === "posts") {
+            // handle arguments for posts
+            let args = "";
+            if (cmd.toLowerCase() === "posts") {
+                args = cmdarr.slice(1);
+            }
+
+            result = f(args, x => {
                 const a = x.slice(1); // remove the '/'
                 return y => {
                     let Component;
@@ -110,13 +170,45 @@ function Shell({ nodeId, splitHandle, removeHandle, interps, setInterps, legacyI
                         const Post = postMap[slug];
                         if (Post) {
                            const { attributes, react: Content } = Post;
-                           Component = () => (
-                             <div>
-                               <h1>{attributes.title}</h1>
-                               <h2>{attributes.date}</h2>
-                               <Content />
-                             </div>
+
+                           // Determine Next and Previous Posts
+                           const allPosts = Object.keys(postMap)
+                               .filter(k => k.startsWith('posts/'))
+                               .sort((a, b) => new Date(postMap[b].attributes.date) - new Date(postMap[a].attributes.date));
+
+                           const currentIndex = allPosts.indexOf(slug);
+                           const nextSlug = currentIndex > 0 ? allPosts[currentIndex - 1] : null;
+                           const prevSlug = currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null;
+
+                           const Navigation = () => (
+                               <div style={{ marginTop: '40px', display: 'flex', justifyContent: 'space-between', borderTop: '1px solid gray', paddingTop: '20px' }}>
+                                   {prevSlug ? (
+                                       <a className="project-link" style={{cursor: 'pointer'}} onClick={y('/post/' + prevSlug)}>
+                                           &larr; {postMap[prevSlug].attributes.title}
+                                       </a>
+                                   ) : <span />}
+
+                                   {nextSlug ? (
+                                       <a className="project-link" style={{cursor: 'pointer'}} onClick={y('/post/' + nextSlug)}>
+                                           {postMap[nextSlug].attributes.title} &rarr;
+                                       </a>
+                                   ) : <span />}
+                               </div>
                            );
+
+                           Component = () => {
+                             useEffect(() => {
+                                 Prism.highlightAll();
+                             }, []);
+                             return (
+                               <div>
+                                 <h1>{attributes.title}</h1>
+                                 <h2>{attributes.date}</h2>
+                                 <Content />
+                                 <Navigation />
+                               </div>
+                             );
+                           };
 
                            // Handle popup mode for posts
                            if (blogView === 'popup') {
