@@ -9,7 +9,7 @@ function useEffectListener(eventName, handler, element) {
 
     useEffect(() => {
         const isSupported = element && element.addEventListener;
-        if (!isSupported) return;
+        if (!isSupported) return undefined;
 
         const eventListener = (event) => savedHandler.current(event);
 
