@@ -4,7 +4,7 @@ module.exports = {
             {
                 test: /\.md$/,
                 loader: 'frontmatter-markdown-loader',
-                options: { mode: ['react-component'] }
+                options: { mode: ['react-component', 'body'] }
             }
         )
         return cfg;

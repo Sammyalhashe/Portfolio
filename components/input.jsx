@@ -1,11 +1,21 @@
 import React, { useRef, useEffect } from 'react';
 import Proptypes from 'prop-types';
 
-function Input({ cmdFunction, results, handleEnter }) {
+function Input({ cmdFunction, results, handleEnter, suggestions }) {
   const textInput = useRef(null);
   let index = results.length;
   const onEnter = e => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const currentVal = textInput.current.value;
+      if (!currentVal) return;
+
+      const matches = suggestions.filter(cmd => cmd.startsWith(currentVal));
+      if (matches.length === 1) {
+          textInput.current.value = matches[0];
+      }
+      // Future: handle multiple matches (show list or cycle)
+    } else if (e.key === 'Enter') {
       const cmd = e.target.value.trim().split(' ');
       cmdFunction(cmd);
       textInput.current.value = '';
@@ -64,7 +74,12 @@ function Input({ cmdFunction, results, handleEnter }) {
 Input.propTypes = {
   cmdFunction: Proptypes.func.isRequired,
   results: Proptypes.array.isRequired,
+  suggestions: Proptypes.array,
   // focused: Proptypes.bool.isRequired,
+};
+
+Input.defaultProps = {
+    suggestions: []
 };
 
 export default Input;

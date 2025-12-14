@@ -1,4 +1,5 @@
 @import 'https://fonts.googleapis.com/css?family=Source+Code+Pro&display=swap';
+@import './prism-theme.css';
 
 :root {
   --bg-color: black;
