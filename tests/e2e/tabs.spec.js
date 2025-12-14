@@ -5,7 +5,7 @@ test('Tab System Integration Test', async ({ page }) => {
   await page.goto('/');
 
   // 2. Verify Tab #1 exists
-  const tab1 = page.locator('.tab-item').first();
+  const tab1 = page.locator('.tab-item:not([title="New Tab"])').first();
   await expect(tab1).toContainText('Tab #1');
   await expect(tab1).toHaveClass(/active/);
 
@@ -15,7 +15,7 @@ test('Tab System Integration Test', async ({ page }) => {
   await input.press('Enter');
 
   // 4. Verify Tab #2 exists and is active
-  const tab2 = page.locator('.tab-item').nth(1);
+  const tab2 = page.locator('.tab-item:not([title="New Tab"])').nth(1);
   await expect(tab2).toContainText('Tab #2');
   await expect(tab2).toHaveClass(/active/);
   // Verify Tab #1 is inactive
