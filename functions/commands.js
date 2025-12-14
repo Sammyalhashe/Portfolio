@@ -24,6 +24,16 @@ const cmds = {
         </div>
         <div className="info">
           <Typewriter text="Enter " />
+          <span className="highlight">"tab"</span>
+          <Typewriter text=" to manage tabs" />
+          <br />
+          <Typewriter text="Usage: " />
+          <span className="highlight">tab new</span>
+          <Typewriter text=" or " />
+          <span className="highlight">tab close</span>
+        </div>
+        <div className="info">
+          <Typewriter text="Enter " />
           <span className="highlight">"right"</span>
           <Typewriter text=" to split the terminal to the right" />
         </div>
@@ -38,7 +48,7 @@ const cmds = {
           <Typewriter text=" to configure the terminal" />
           <br />
           <Typewriter text="Usage: " />
-          <span className="highlight">conf blogView:&lt;inline/popup/page&gt;</span>
+          <span className="highlight">conf blogView:&lt;inline/popup/page/tab&gt;</span>
           <Typewriter text=" or " />
           <span className="highlight">conf theme:&lt;theme&gt;</span>
           <br />

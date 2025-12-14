@@ -221,3 +221,34 @@ body {
     outline: none;
     border-color: var(--highlight-color);
 }
+
+/* Tab Bar Styles */
+.tab-bar {
+  display: flex;
+  background-color: var(--bg-color);
+  border-bottom: 1px solid var(--info-color);
+  height: 30px;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.tab-list {
+  display: flex;
+}
+
+.tab-item {
+  padding: 0 10px;
+  line-height: 28px;
+  cursor: pointer;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  margin-right: 2px;
+  border-right: 1px solid var(--info-color);
+  white-space: nowrap;
+}
+
+.tab-item.active {
+  background-color: var(--info-color);
+  color: var(--bg-color);
+  font-weight: bold;
+}

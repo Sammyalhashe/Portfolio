@@ -22,9 +22,10 @@ const StringToPageComponents = {
     "Bloomberg": Bloomberg
 };
 
-function Shell({ nodeId, splitHandle, removeHandle, interps, setInterps, legacyInterps, setLegacyInterps, blogView, setBlogView, setModal, setPage, setTheme, theme }) {
+function Shell({ nodeId, splitHandle, removeHandle, interps, setInterps, legacyInterps, setLegacyInterps, blogView, setBlogView, setModal, setPage, setTheme, theme, windowTree, isFocused, onFocus }) {
   const shellId = nodeId;
   const shellRef = useRef(null);
+  const inputRef = useRef(null); // Reference to the input component or input element
 
   // Auto-scroll to bottom when interps change
   useEffect(() => {
@@ -32,6 +33,17 @@ function Shell({ nodeId, splitHandle, removeHandle, interps, setInterps, legacyI
         shellRef.current.scrollTop = shellRef.current.scrollHeight;
     }
   }, [interps, legacyInterps]);
+
+  // Handle Focus
+  useEffect(() => {
+    if (isFocused && shellRef.current) {
+        // Find input element and focus it
+        const input = shellRef.current.querySelector('input');
+        if (input) {
+            input.focus();
+        }
+    }
+  }, [isFocused]);
 
   // build commands
   const buildCmdRes = (cmd, result) => {
@@ -65,17 +77,36 @@ function Shell({ nodeId, splitHandle, removeHandle, interps, setInterps, legacyI
         splitHandle.handleSplitFromId(shellId, 0);
     } else if (cmd.toLowerCase() === 'exit') {
 		splitHandle.handleRemoveFromId(shellId);
+    } else if (cmd.toLowerCase() === 'tab') {
+        const arg = cmdarr[1];
+        if (arg === 'new') {
+            windowTree.handleTabNew();
+            const cmdRes = buildCmdRes(cmdarr.join(" "), <div className="output info">New tab created</div>);
+            setInterps([...interps, cmdRes]);
+            setLegacyInterps([...legacyInterps, cmdRes]);
+        } else if (arg === 'close') {
+            windowTree.handleTabClose();
+             // If we closed the current tab, this component might unmount,
+             // but if we are still here (e.g. only 1 tab left), show msg.
+            const cmdRes = buildCmdRes(cmdarr.join(" "), <div className="output info">Tab closed</div>);
+            setInterps([...interps, cmdRes]);
+            setLegacyInterps([...legacyInterps, cmdRes]);
+        } else {
+             const cmdRes = buildCmdRes(cmdarr.join(" "), <div className="output error">Usage: tab &lt;new/close&gt;</div>);
+             setInterps([...interps, cmdRes]);
+             setLegacyInterps([...legacyInterps, cmdRes]);
+        }
     } else if (cmd.toLowerCase() === 'conf') {
         const arg = cmdarr[1];
         if (arg && arg.startsWith('blogView:')) {
             const mode = arg.split(':')[1];
-            if (mode === 'inline' || mode === 'popup' || mode === 'page') {
+            if (mode === 'inline' || mode === 'popup' || mode === 'page' || mode === 'tab') {
                 setBlogView(mode);
                 const cmdRes = buildCmdRes(cmdarr.join(" "), <div className="output info">Blog view set to {mode}</div>);
                 setInterps([...interps, cmdRes]);
                 setLegacyInterps([...legacyInterps, cmdRes]);
             } else {
-                const cmdRes = buildCmdRes(cmdarr.join(" "), <div className="output error">Invalid mode. Use inline, popup, or page</div>);
+                const cmdRes = buildCmdRes(cmdarr.join(" "), <div className="output error">Invalid mode. Use inline, popup, page, or tab</div>);
                 setInterps([...interps, cmdRes]);
                 setLegacyInterps([...legacyInterps, cmdRes]);
             }
@@ -91,7 +122,7 @@ function Shell({ nodeId, splitHandle, removeHandle, interps, setInterps, legacyI
                 setLegacyInterps([...legacyInterps, cmdRes]);
             }
         } else {
-            const cmdRes = buildCmdRes(cmdarr.join(" "), <div className="output error">Usage: conf blogView:&lt;inline/popup/page&gt; or conf theme:&lt;theme&gt;</div>);
+            const cmdRes = buildCmdRes(cmdarr.join(" "), <div className="output error">Usage: conf blogView:&lt;inline/popup/page/tab&gt; or conf theme:&lt;theme&gt;</div>);
             setInterps([...interps, cmdRes]);
             setLegacyInterps([...legacyInterps, cmdRes]);
         }
@@ -132,6 +163,9 @@ function Shell({ nodeId, splitHandle, removeHandle, interps, setInterps, legacyI
                                url.searchParams.set('post', slug);
                                window.history.pushState({}, '', url);
                                setPage(<Component />);
+                               return;
+                           } else if (blogView === 'tab') {
+                               setPage(<Component />); // setPage handles tab logic if blogView is tab
                                return;
                            }
                         } else {
@@ -221,6 +255,9 @@ function Shell({ nodeId, splitHandle, removeHandle, interps, setInterps, legacyI
                                window.history.pushState({}, '', url);
                                setPage(<Component />);
                                return; // Don't add to interps
+                           } else if (blogView === 'tab') {
+                               setPage(<Component />); // setPage handles tab logic
+                               return;
                            }
 
                         } else {
@@ -271,10 +308,16 @@ function Shell({ nodeId, splitHandle, removeHandle, interps, setInterps, legacyI
     }
   };
 
-  const commandList = Object.keys(cmds).concat(['clear', 'right', 'down', 'exit', 'conf']);
+  const commandList = Object.keys(cmds).concat(['clear', 'right', 'down', 'exit', 'conf', 'tab']);
 
   return (
-      <div ref={shellRef} style={{width: '100%', height: '100%', overflowY: 'scroll', paddingRight: '17px', boxSizing: 'content-box'}} className="shell" id={shellId}>
+      <div
+        ref={shellRef}
+        style={{width: '100%', height: '100%', overflowY: 'scroll', paddingRight: '17px', boxSizing: 'content-box', border: isFocused ? '1px solid var(--info-color)' : 'none'}}
+        className={`shell ${isFocused ? 'focused' : ''}`}
+        id={shellId}
+        onClick={onFocus}
+      >
       <Interpolator interpolatedResults={interps} />
       <Input cmdFunction={applyCmd} results={legacyInterps} handleEnter={handleEnter} suggestions={commandList} />
     </div>

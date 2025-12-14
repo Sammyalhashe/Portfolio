@@ -10,6 +10,9 @@ function HomePage() {
   const [renderTree, setRenderTree] = useState(new WindowTree(setInterps));
   const router = useRouter();
 
+  // State for Alt-t sequence (global)
+  const [waitingForTabCmd, setWaitingForTabCmd] = useState(false);
+
   useEffect(() => {
     // Detect theme on mount
     renderTree.detectTheme();
@@ -75,6 +78,62 @@ function HomePage() {
       }
     }
   }, [router.isReady, router.query.post]);
+
+  // Global Keyboard Handling
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+        // Alt + t sequence handling
+        if (e.altKey && e.key === 't') {
+            e.preventDefault();
+            setWaitingForTabCmd(true);
+            return;
+        }
+
+        if (waitingForTabCmd) {
+            e.preventDefault();
+            setWaitingForTabCmd(false); // Reset state
+            switch (e.key) {
+                case 'n':
+                    renderTree.handleTabNew();
+                    break;
+                case 'x':
+                    renderTree.handleTabClose();
+                    break;
+                case '[':
+                    renderTree.handleTabPrev();
+                    break;
+                case ']':
+                    renderTree.handleTabNext();
+                    break;
+                default:
+                    // Cancel sequence
+                    break;
+            }
+            return;
+        }
+
+        // Ctrl + h/j/k/l navigation
+        if (e.ctrlKey) {
+            if (e.key === 'h') {
+                e.preventDefault();
+                renderTree.handleFocusMove('h');
+            } else if (e.key === 'j') {
+                e.preventDefault();
+                renderTree.handleFocusMove('j');
+            } else if (e.key === 'k') {
+                e.preventDefault();
+                renderTree.handleFocusMove('k');
+            } else if (e.key === 'l') {
+                e.preventDefault();
+                renderTree.handleFocusMove('l');
+            }
+        }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [waitingForTabCmd, renderTree]);
+
 
   return (
     <div className="main">
