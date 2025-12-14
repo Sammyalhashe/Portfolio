@@ -73,14 +73,27 @@ function HomePage() {
                     );
                 }
 
-                const Component = () => (
-                    <div>
-                        <h1>{attributes.title}</h1>
-                        <h2>{attributes.date}</h2>
-                        <Content />
-                        {seriesNav}
-                    </div>
-                );
+                let Component;
+                if (typeof Content === 'function') {
+                    Component = () => (
+                        <div>
+                            <h1>{attributes.title}</h1>
+                            <h2>{attributes.date}</h2>
+                            <Content />
+                            {seriesNav}
+                        </div>
+                    );
+                } else {
+                    // eslint-disable-next-line no-console
+                    console.error(`[Error] Post content is not a function for slug: ${slug}`, Content);
+                    Component = () => (
+                        <div>
+                            <h1>{attributes.title}</h1>
+                            <h2>{attributes.date}</h2>
+                            <p style={{ color: 'red' }}>Error: Post content format is invalid.</p>
+                        </div>
+                    );
+                }
                 renderTree.setPage(<Component />);
             }
         }

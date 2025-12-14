@@ -147,7 +147,9 @@ function Shell({
             } else {
                 const cmdRes = buildCmdRes(
                     cmdarr.join(' '),
-                    <div className="output error">Usage: conf blogView:&lt;mode&gt; or conf theme:&lt;theme&gt;</div>
+                    <div className="output error">
+                        Usage: conf blogView:&lt;mode&gt; or conf theme:&lt;theme&gt;
+                    </div>
                 );
                 setInterps([...interps, cmdRes]);
                 setLegacyInterps([...legacyInterps, cmdRes]);
@@ -222,9 +224,13 @@ function Shell({
                         args = cmdarr.slice(1);
                     }
 
-                    result = f(args, (x) => {
+                    // Define navCallback before using it
+                    const navCallback = (x) => {
                         const a = x.slice(1); // remove the '/'
-                        return (y) => {
+                        return (e) => { // e is event, unused but we need to return a handler
+                            // Prevent default if it's an event (though <a> without href might not need it, but good practice)
+                            if (e && e.preventDefault) e.preventDefault();
+
                             let Component;
                             if (a.startsWith('post/')) {
                                 const slug = a.replace('post/', '');
@@ -244,13 +250,13 @@ function Shell({
                                     const Navigation = () => (
                                         <div style={{ marginTop: '40px', display: 'flex', justifyContent: 'space-between', borderTop: '1px solid gray', paddingTop: '20px' }}>
                                             {prevSlug ? (
-                                                <a className="project-link" style={{ cursor: 'pointer' }} onClick={y(`/post/${prevSlug}`)}>
+                                                <a className="project-link" style={{ cursor: 'pointer' }} onClick={navCallback(`/post/${prevSlug}`)}>
                                                     &larr; {postMap[prevSlug].attributes.title}
                                                 </a>
                                             ) : <span />}
 
                                             {nextSlug ? (
-                                                <a className="project-link" style={{ cursor: 'pointer' }} onClick={y(`/post/${nextSlug}`)}>
+                                                <a className="project-link" style={{ cursor: 'pointer' }} onClick={navCallback(`/post/${nextSlug}`)}>
                                                     {postMap[nextSlug].attributes.title} &rarr;
                                                 </a>
                                             ) : <span />}
@@ -306,7 +312,9 @@ function Shell({
                             setInterps([...interps, cmdRes]);
                             setLegacyInterps([...legacyInterps, cmdRes]);
                         };
-                    });
+                    };
+
+                    result = f(args, navCallback);
                 } else if (f.length > 0) {
                     result = f(cmdarr.slice(1));
                 } else {
