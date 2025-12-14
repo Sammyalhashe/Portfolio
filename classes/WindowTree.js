@@ -2,10 +2,10 @@
 /* eslint-disable react/jsx-filename-extension */
 /* eslint-disable no-console */
 import React from 'react';
-import Shell from "../Shell";
-import ProgressBar from "../components/ProgressBar";
-import cmds from "../functions/commands";
 import { v4 as uuidv4 } from 'uuid';
+import Shell from '../Shell';
+import ProgressBar from '../components/ProgressBar';
+import cmds from '../functions/commands';
 
 const Split = {
     HORIZONTAL: 0,
@@ -115,7 +115,7 @@ class Node {
         parent = null,
         parentDir = ParentDirection.NONE,
         left = null,
-        right = null
+        right = null,
     ) {
         this.nodeId = nodeId;
         this.val = val;
@@ -134,14 +134,14 @@ class Node {
         if (this.isLeaf) {
             const newId = uuidv4();
             const splitNode = new Node(
-                newId,                  // nodeId
-                null,                   // val
-                direction,              // dirSplit
-                false,                  // isLeaf
-                this.parent,            // parent
-                this.parentDir,         // parentDir
-                node,                   // left (New Empty)
-                this                    // right (Existing Content)
+                newId, // nodeId
+                null, // val
+                direction, // dirSplit
+                false, // isLeaf
+                this.parent, // parent
+                this.parentDir, // parentDir
+                node, // left (New Empty)
+                this, // right (Existing Content)
             ); // create new split node
 
             // save the old parentDir
@@ -277,7 +277,7 @@ class WindowTree {
         let p = currentNode;
         while (p.parent) {
             const isLeftChild = p.parentDir === ParentDirection.LEFT;
-            const parent = p.parent;
+            const { parent } = p;
             const splitDir = parent.dirSplit; // HORIZONTAL (0) or VERTICAL (1)
 
             // Logic:
@@ -550,7 +550,7 @@ class WindowTree {
             console.log(targetNodeId);
             this.printTree();
             const nodeToRemove = this.shellMap.get(targetNodeId);
-            const parent = nodeToRemove.parent;
+            const { parent } = nodeToRemove;
 
             let nodeLeftOver; // node that will remain after deletion
             if (nodeToRemove.parentDir === ParentDirection.LEFT) {
@@ -628,7 +628,7 @@ class WindowTree {
 
     render() {
         return (
-            <React.Fragment>
+            <>
                 {this.renderTabBar()}
                 <div className="main-content" style={{ height: 'calc(100% - 30px)', position: 'relative' }}>
                     {this.renderTree(this.rootNode)}
@@ -662,7 +662,7 @@ class WindowTree {
                         </div>
                     </div>
                 )}
-            </React.Fragment>
+            </>
         );
     }
 

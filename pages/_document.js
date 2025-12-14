@@ -3,7 +3,7 @@ import Document, {
     Main,
     NextScript,
     Head
-} from "next/document";
+} from 'next/document';
 
 class MyDocument extends Document {
     static async getInitialProps(ctx) {
@@ -14,15 +14,15 @@ class MyDocument extends Document {
 
     render() {
         return (
-        <Html>
-            <Head>
-            <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-            </Head>
-            <body>
-                <Main />
-                <NextScript />
-            </body>
-        </Html>
+            <Html>
+                <Head>
+                    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+                </Head>
+                <body>
+                    <Main />
+                    <NextScript />
+                </body>
+            </Html>
         );
     }
 }

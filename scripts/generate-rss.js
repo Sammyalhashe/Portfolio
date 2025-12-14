@@ -1,4 +1,3 @@
-
 const fs = require('fs');
 const path = require('path');
 const RSS = require('rss');
@@ -15,7 +14,7 @@ function getPosts() {
 
     const files = fs.readdirSync(postsDir);
 
-    files.forEach(file => {
+    files.forEach((file) => {
         if (!file.endsWith('.md')) return;
         const filePath = path.join(postsDir, file);
         const content = fs.readFileSync(filePath, 'utf8');
@@ -29,14 +28,18 @@ function getPosts() {
             const dateMatch = fm.match(/date:\s*(?:"(.*)"|'(.*)'|(.*))/);
 
             // Extract the first non-undefined group
-            const title = titleMatch ? (titleMatch[1] || titleMatch[2] || titleMatch[3]).trim() : file;
-            const date = dateMatch ? (dateMatch[1] || dateMatch[2] || dateMatch[3]).trim() : new Date();
+            const title = titleMatch
+                ? (titleMatch[1] || titleMatch[2] || titleMatch[3]).trim()
+                : file;
+            const date = dateMatch
+                ? (dateMatch[1] || dateMatch[2] || dateMatch[3]).trim()
+                : new Date();
 
             posts.push({
                 title,
                 date,
-                description: 'A post from Notes from the Terminal', // Placeholder or parse description
-                url: `https://salh.xyz/?post=posts/${file.replace('.md', '')}`, // Deep link format
+                description: 'A post from Notes from the Terminal',
+                url: `https://salh.xyz/?post=posts/${file.replace('.md', '')}`,
                 guid: file,
                 author: 'Sammy Al Hashemi'
             });
@@ -60,12 +63,13 @@ function generateRSS() {
     });
 
     const posts = getPosts();
-    posts.forEach(post => {
+    posts.forEach((post) => {
         feed.item(post);
     });
 
     const xml = feed.xml({ indent: true });
     fs.writeFileSync(path.join(__dirname, '../public/rss.xml'), xml);
+    // eslint-disable-next-line no-console
     console.log('RSS Feed generated at public/rss.xml');
 }
 

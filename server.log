@@ -35,3 +35,10 @@ Warning: Input: Support for defaultProps will be removed from function component
  ✓ Compiled / in 555ms (438 modules)
  GET / 200 in 937ms
  ✓ Compiled in 1584ms (288 modules)
+ ⚠ Found a change in next.config.js. Restarting the server to apply the changes...
+   ▲ Next.js 15.5.9
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.0.2:3000
+
+ ✓ Starting...
+ ✓ Ready in 4s

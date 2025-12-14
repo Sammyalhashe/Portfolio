@@ -6,8 +6,8 @@ module.exports = {
                 loader: 'frontmatter-markdown-loader',
                 options: { mode: ['react-component', 'body'] }
             }
-        )
+        );
         return cfg;
     },
-    output:'export',
-}
+    output: 'export',
+};

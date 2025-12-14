@@ -1,6 +1,7 @@
 /* eslint-env browser */
+/* eslint-disable react/jsx-filename-extension */
+/* eslint-disable react/no-unescaped-entities */
 import React from 'react';
-import Link from 'next/link';
 import postMap from './post_loader';
 import Typewriter from '../components/Typewriter';
 
@@ -22,6 +23,11 @@ const cmds = {
                     <Typewriter text="Enter " />
                     <span className="highlight">"posts"</span>
                     <Typewriter text=" to see my blog posts" />
+                    <br />
+                    <Typewriter text="Usage: " />
+                    <span className="highlight">posts --series &lt;series_name&gt;</span>
+                    <Typewriter text=" or " />
+                    <span className="highlight">posts --tag &lt;tag_name&gt;</span>
                 </div>
                 <div className="info">
                     <Typewriter text="Enter " />
@@ -225,6 +231,7 @@ const cmds = {
                     </div>
                     <div className="wrapper">
                         <div className="longinfo">
+                            {/* eslint-disable-next-line max-len */}
                             48bks8r6hSL5thvR6Skrps7jY3itJp4oSGuH9JRTGTz6jUaguqgdMpcgkFa7Tz81LQLLGH1DjaUnn9odXXxFATQVQBLKp1S
                         </div>
                     </div>
@@ -296,7 +303,8 @@ const cmds = {
     // Handling "posts --tag <tagname>"
         let filterTag = null;
         if (args && args.length >= 2 && args[0] === '--tag') {
-            filterTag = args[1];
+            const [, tag] = args; // Destructuring fix
+            filterTag = tag;
         }
 
         // Handling "posts --series <seriesname>"
@@ -413,7 +421,9 @@ const cmds = {
             };
             return (
                 <div key={seriesName} className="info">
-                    {link()} <span style={{ fontSize: '0.8em', opacity: 0.7 }}>(Use: posts --series "{seriesName}")</span>
+                    {link()}
+                    {' '}
+                    <span style={{ fontSize: '0.8em', opacity: 0.7 }}>(Use: posts --series "{seriesName}")</span>
                 </div>
             );
         });
@@ -544,16 +554,9 @@ const cmds = {
 
         return <div className="output">{results}</div>;
     },
-    old: () => {
-        const a = document.createElement('a');
-        a.target = '_blank';
-        a.href = 'https://sammyalhashemi.com';
-        a.click();
-        a.remove();
-        return <div className="output info">Website opened on another tab...</div>;
-    },
     resume: (inline = false) => {
-        const href = 'https://firebasestorage.googleapis.com/v0/b/arduinohandler.appspot.com/o/Downloadable%2Fresume.pdf?alt=media&token=c75d66f7-c4bd-4ec8-bed1-9b567e8017f0';
+        const href = 'https://firebasestorage.googleapis.com/v0/b/arduinohandler.appspot.com/o/'
+            + 'Downloadable%2Fresume.pdf?alt=media&token=c75d66f7-c4bd-4ec8-bed1-9b567e8017f0';
         if (!inline) {
             const a = document.createElement('a');
             a.target = '_blank';
