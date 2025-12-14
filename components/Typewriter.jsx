@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 
-const Typewriter = ({ text, speed = 20, onComplete }) => {
+const Typewriter = ({ text, speed, onComplete }) => {
   const [displayedText, setDisplayedText] = useState("");
   const [index, setIndex] = useState(0);
 
@@ -12,10 +12,9 @@ const Typewriter = ({ text, speed = 20, onComplete }) => {
         setIndex((prev) => prev + 1);
       }, speed);
       return () => clearTimeout(timeoutId);
-    } else {
-      if (onComplete) {
-        onComplete();
-      }
+    }
+    if (onComplete) {
+      onComplete();
     }
   }, [index, text, speed, onComplete]);
 
@@ -26,6 +25,11 @@ Typewriter.propTypes = {
   text: PropTypes.string.isRequired,
   speed: PropTypes.number,
   onComplete: PropTypes.func,
+};
+
+Typewriter.defaultProps = {
+  speed: 20,
+  onComplete: null,
 };
 
 export default Typewriter;
