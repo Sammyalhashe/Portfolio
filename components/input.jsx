@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import Proptypes from 'prop-types';
 
-function Input({ cmdFunction, results, handleEnter, suggestions }) {
+function Input({ cmdFunction, results, handleEnter, suggestions = [] }) {
   const textInput = useRef(null);
   let index = results.length;
   const onEnter = e => {
@@ -78,8 +78,6 @@ Input.propTypes = {
   // focused: Proptypes.bool.isRequired,
 };
 
-Input.defaultProps = {
-    suggestions: []
-};
+
 
 export default Input;
