@@ -118,6 +118,11 @@ const cmds = {
                 </div>
                 <div className="info">
                     <Typewriter text="Enter " />
+                    <span className="highlight">"rss"</span>
+                    <Typewriter text=" to get the RSS feed" />
+                </div>
+                <div className="info">
+                    <Typewriter text="Enter " />
                     <span className="highlight">"picture"</span>
                     <Typewriter text=" to see a picture of me" />
                 </div>
@@ -594,6 +599,18 @@ const cmds = {
         return (
             <div id="object" className="image">
                 <img src="/collision_pic.jpg" alt="Me" />
+            </div>
+        );
+    },
+    rss: () => {
+        return (
+            <div className="output">
+                <div className="info">
+                    <Typewriter text="RSS Feed available at: " />
+                    <a className="project-link" href="/rss.xml" target="_blank" rel="noreferrer">
+                        https://salh.xyz/rss.xml
+                    </a>
+                </div>
             </div>
         );
     },
