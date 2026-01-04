@@ -17,6 +17,7 @@ class MyDocument extends Document {
             <Html>
                 <Head>
                     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+                    <link rel="alternate" type="application/rss+xml" title="Notes from the Terminal" href="/rss.xml" />
                 </Head>
                 <body>
                     <Main />
