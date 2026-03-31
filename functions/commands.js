@@ -555,8 +555,7 @@ const cmds = {
         return <div className="output">{results}</div>;
     },
     resume: (inline = false) => {
-        const href = 'https://firebasestorage.googleapis.com/v0/b/arduinohandler.appspot.com/o/'
-            + 'Downloadable%2Fresume.pdf?alt=media&token=c75d66f7-c4bd-4ec8-bed1-9b567e8017f0';
+        const href = 'https://resume.salh.xyz';
         if (!inline) {
             const a = document.createElement('a');
             a.target = '_blank';
