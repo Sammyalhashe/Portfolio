@@ -9,33 +9,33 @@
             <link>https://salh.xyz</link>
         </image>
         <generator>RSS for Node</generator>
-        <lastBuildDate>Sun, 14 Dec 2025 06:49:39 GMT</lastBuildDate>
+        <lastBuildDate>Sun, 04 Jan 2026 19:21:12 GMT</lastBuildDate>
         <atom:link href="https://salh.xyz/rss.xml" rel="self" type="application/rss+xml"/>
-        <copyright><![CDATA[Copyright 2025 Sammy Al Hashemi]]></copyright>
+        <copyright><![CDATA[Copyright 2026 Sammy Al Hashemi]]></copyright>
         <language><![CDATA[en]]></language>
         <managingEditor><![CDATA[sammy@salh.xyz (Sammy Al Hashemi)]]></managingEditor>
         <webMaster><![CDATA[sammy@salh.xyz (Sammy Al Hashemi)]]></webMaster>
         <item>
-            <title><![CDATA[Crypto Trader Part 2]]></title>
+            <title><![CDATA[How to Use This Terminal Blog]]></title>
             <description><![CDATA[A post from Notes from the Terminal]]></description>
-            <link>https://salh.xyz/?post=posts/crypto-trader-2</link>
-            <guid isPermaLink="false">crypto-trader-2.md</guid>
+            <link>https://salh.xyz/?post=posts/how-to-use-this-blog</link>
+            <guid isPermaLink="false">how-to-use-this-blog.md</guid>
             <dc:creator><![CDATA[Sammy Al Hashemi]]></dc:creator>
-            <pubDate>Sat, 06 Dec 2025 00:00:00 GMT</pubDate>
-        </item>
-        <item>
-            <title><![CDATA[Crypto Trader Part 1]]></title>
-            <description><![CDATA[A post from Notes from the Terminal]]></description>
-            <link>https://salh.xyz/?post=posts/crypto-trader-1</link>
-            <guid isPermaLink="false">crypto-trader-1.md</guid>
-            <dc:creator><![CDATA[Sammy Al Hashemi]]></dc:creator>
-            <pubDate>Fri, 05 Dec 2025 00:00:00 GMT</pubDate>
+            <pubDate>Sun, 04 Jan 2026 00:00:00 GMT</pubDate>
         </item>
         <item>
             <title><![CDATA[My First Post]]></title>
             <description><![CDATA[A post from Notes from the Terminal]]></description>
             <link>https://salh.xyz/?post=posts/my-first-post</link>
             <guid isPermaLink="false">my-first-post.md</guid>
+            <dc:creator><![CDATA[Sammy Al Hashemi]]></dc:creator>
+            <pubDate>Thu, 04 Dec 2025 00:00:00 GMT</pubDate>
+        </item>
+        <item>
+            <title><![CDATA[My Experience Working With AI]]></title>
+            <description><![CDATA[A post from Notes from the Terminal]]></description>
+            <link>https://salh.xyz/?post=posts/my-working-experience-with-ai</link>
+            <guid isPermaLink="false">my-working-experience-with-ai.md</guid>
             <dc:creator><![CDATA[Sammy Al Hashemi]]></dc:creator>
             <pubDate>Thu, 04 Dec 2025 00:00:00 GMT</pubDate>
         </item>
