@@ -60,7 +60,8 @@ body {
 }
 
 .info {
-  padding: 10px;
+  padding: 0 10px;
+  line-height: 1.3;
   color: var(--info-color);
 }
 
@@ -109,14 +110,66 @@ body {
 }
 
 .image img {
-  width: 260px;
-  height: 200px;
+  display: block;
+  width: 320px;
+  max-width: 100%;
+  height: auto;
+}
+
+@media only screen and (max-width: 480px) {
+  .image img {
+    width: 100%;
+  }
 }
 
 .longinfo {
   word-wrap: anywhere;
   padding: 10px;
   color: var(--info-color);
+}
+
+.neofetch-output {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.neofetch-art {
+  color: var(--highlight-color);
+  white-space: pre;
+  line-height: 1.2;
+}
+
+.neofetch-info-line {
+  white-space: pre;
+  line-height: 1.2;
+}
+
+@media only screen and (max-width: 480px) {
+  .neofetch-output {
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
+.resume-embed {
+  width: 100%;
+  max-width: 700px;
+  padding: 10px 10px 0;
+}
+
+.resume-embed object {
+  display: block;
+  width: 100%;
+  height: 70vh;
+  max-height: 600px;
+  border: 1px solid var(--info-color);
+}
+
+@media only screen and (max-width: 480px) {
+  .resume-embed object {
+    height: 60vh;
+  }
 }
 
 .shellContainer {

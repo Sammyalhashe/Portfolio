@@ -63,11 +63,6 @@ const cmds = {
                 </div>
                 <div className="info">
                     <Typewriter text="Enter " />
-                    <span className="highlight">"coffee"</span>
-                    <Typewriter text=" to send a tip if you want :)" />
-                </div>
-                <div className="info">
-                    <Typewriter text="Enter " />
                     <span className="highlight">"project"</span>
                     <Typewriter text=" to see my projects" />
                 </div>
@@ -95,11 +90,6 @@ const cmds = {
                     <Typewriter text="Enter " />
                     <span className="highlight">"resume"</span>
                     <Typewriter text=" to open a downloadable copy of my resume" />
-                </div>
-                <div className="info">
-                    <Typewriter text="Enter " />
-                    <span className="highlight">"old"</span>
-                    <Typewriter text=" to open my older portfolio" />
                 </div>
                 <div className="info">
                     <Typewriter text="Enter " />
@@ -161,8 +151,7 @@ const cmds = {
 
         const platform = (typeof navigator !== 'undefined') ? navigator.platform : 'Unknown';
 
-        const asciiArt = `
-      .::-
+        const asciiArt = `      .::-
     .::.
    .::
   .::   .:::.
@@ -175,66 +164,36 @@ const cmds = {
     .::..::
    .::    .::
   .::      .::
- .::        .::
-`.split('\n');
+ .::        .::`.split('\n');
+
+        const header = 'visitor@salh.xyz';
+        const separator = '-'.repeat(header.length);
+
+        const fields = [
+            ['Host', 'salh.xyz'],
+            ['OS', platform],
+            ['Uptime', uptime],
+            ['Shell', 'React-Terminal'],
+            ['Theme', theme || 'default'],
+        ];
+        const labelWidth = Math.max(...fields.map(([label]) => label.length));
 
         return (
-            <div className="output" style={{ display: 'flex', gap: '20px' }}>
-                <div className="ascii-art" style={{ color: 'var(--highlight-color)', whiteSpace: 'pre', lineHeight: '1.2' }}>
+            <div className="output neofetch-output">
+                <div className="neofetch-art">
                     {asciiArt.map((line, i) => <div key={i}>{line}</div>)}
                 </div>
-                <div className="system-info">
-                    <div className="info">
-                        <span className="highlight">visitor@salh.xyz</span>
+                <div className="neofetch-info">
+                    <div className="info neofetch-info-line">
+                        <span className="highlight">{header}</span>
                     </div>
-                    <div className="info">----------------</div>
-                    <div className="info">
-                        <span className="highlight">Host</span>
-                        :
-                        <Typewriter text="salh.xyz" />
-                    </div>
-                    <div className="info">
-                        <span className="highlight">OS</span>
-                        :
-                        <Typewriter text={platform} />
-                    </div>
-                    <div className="info">
-                        <span className="highlight">Uptime</span>
-                        :
-                        <Typewriter text={uptime} />
-                    </div>
-                    <div className="info">
-                        <span className="highlight">Shell</span>
-                        :
-                        <Typewriter text="React-Terminal" />
-                    </div>
-                    <div className="info">
-                        <span className="highlight">Theme</span>
-                        :
-                        <Typewriter text={theme || 'default'} />
-                    </div>
-                </div>
-            </div>
-        );
-    },
-    coffee: () => {
-        return (
-            <div className="wrapper">
-                <div id="object">
-                    <div className="wrapper">
-                        <div className="info">
-                            Monero address:
+                    <div className="info neofetch-info-line">{separator}</div>
+                    {fields.map(([label, value]) => (
+                        <div className="info neofetch-info-line" key={label}>
+                            <span className="highlight">{label.padEnd(labelWidth)}</span>
+                            {`: ${value}`}
                         </div>
-                    </div>
-                    <div className="wrapper">
-                        <img src="/QR_code.png" alt="Donations are appreciated :)" />
-                    </div>
-                    <div className="wrapper">
-                        <div className="longinfo">
-                            {/* eslint-disable-next-line max-len */}
-                            48bks8r6hSL5thvR6Skrps7jY3itJp4oSGuH9JRTGTz6jUaguqgdMpcgkFa7Tz81LQLLGH1DjaUnn9odXXxFATQVQBLKp1S
-                        </div>
-                    </div>
+                    ))}
                 </div>
             </div>
         );
@@ -555,22 +514,52 @@ const cmds = {
         return <div className="output">{results}</div>;
     },
     resume: (inline = false) => {
-        const href = 'https://resume.salh.xyz';
-        if (!inline) {
-            const a = document.createElement('a');
-            a.target = '_blank';
-            a.href = href;
-            a.click();
-            a.remove();
+        const pageHref = 'https://resume.salh.xyz';
+        const pdfHref = 'https://resume.salh.xyz/resume.pdf';
 
-            return <div className="output info">Resume opened on new page</div>;
+        if (inline) {
+            return (
+                <span className="info">
+                    <a className="project-link" href={pageHref}>
+                        resume.pdf
+                    </a>
+                </span>
+            );
         }
-        return (
-            <span className="info">
-                <a className="project-link" href={href}>
-                    resume.pdf
+
+        // iOS Safari and Chrome on Android frequently fail to render a
+        // cross-origin PDF inside an iframe/object/embed (silent blank box),
+        // so skip the embed attempt on those platforms and go straight to a
+        // visible fallback link instead of leaving an empty box on screen.
+        const ua = (typeof navigator !== 'undefined' && navigator.userAgent) || '';
+        const embedUnsupported = /iPad|iPhone|iPod|Android/i.test(ua);
+
+        const openLink = (
+            <div className="info">
+                <a className="project-link" href={pdfHref} target="_blank" rel="noreferrer">
+                    Open / download full resume.pdf
                 </a>
-            </span>
+            </div>
+        );
+
+        if (embedUnsupported) {
+            return (
+                <div className="output">
+                    <div className="info">Inline PDF preview isn&apos;t supported on this browser.</div>
+                    {openLink}
+                </div>
+            );
+        }
+
+        return (
+            <div className="output">
+                <div className="resume-embed">
+                    <object data={pdfHref} type="application/pdf" aria-label="Resume PDF preview">
+                        <div className="info">Inline PDF preview isn&apos;t supported on this browser.</div>
+                    </object>
+                </div>
+                {openLink}
+            </div>
         );
     },
     github: () => {
@@ -592,7 +581,7 @@ const cmds = {
     picture: () => {
         return (
             <div id="object" className="image">
-                <img src="/collision_pic.jpg" alt="Me" />
+                <img src="/collision_pic.jpg" alt="Me" width={1280} height={853} />
             </div>
         );
     },
