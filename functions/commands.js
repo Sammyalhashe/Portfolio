@@ -89,7 +89,7 @@ const cmds = {
                 <div className="info">
                     <Typewriter text="Enter " />
                     <span className="highlight">"resume"</span>
-                    <Typewriter text=" to open a downloadable copy of my resume" />
+                    <Typewriter text=" to view my resume inline (with a download link)" />
                 </div>
                 <div className="info">
                     <Typewriter text="Enter " />
