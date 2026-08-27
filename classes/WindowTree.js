@@ -198,14 +198,27 @@ class WindowTree {
         const newNode = new Node(rootId, null);
         this.shellMap.set(rootId, newNode);
 
-        this.tabs = [{
-            rootId,
-            root: newNode,
-            name: 'Tab #1'
-        }];
+        // Create the resume tab alongside it. Only the active tab is mounted by
+        // render(), so the PDF isn't fetched until this tab is actually selected.
+        const resumeRootId = uuidv4();
+        const resumeNode = new Node(resumeRootId, null);
+        this.shellMap.set(resumeRootId, resumeNode);
+
+        this.tabs = [
+            {
+                rootId,
+                root: newNode,
+                name: 'terminal'
+            },
+            {
+                rootId: resumeRootId,
+                root: resumeNode,
+                name: 'resume'
+            }
+        ];
         this.activeTabIndex = 0;
         this.activeNodeId = rootId;
-        this.tabCounter = 1;
+        this.tabCounter = 2;
 
         // Bind methods to this instance
         this.setBlogView = this.setBlogView.bind(this);
@@ -498,6 +511,21 @@ class WindowTree {
         if (rootNode && rootNode.interps.length === 0) {
             const result = cmds.neofetch(null, null, { theme: this.theme });
             const cmdRes = { cmd: null, result };
+            rootNode.interps.push(cmdRes);
+            rootNode.legacyInterps.push(cmdRes);
+            this.context(this.render());
+        }
+    }
+
+    injectResume() {
+        // Seed the resume tab with the same output the `resume` command produces,
+        // so the two entry points can never drift. Must run client-side: cmds.resume
+        // reads navigator.userAgent to decide whether to attempt the PDF embed.
+        const resumeTab = this.tabs.find((tab) => tab.name === 'resume');
+        const rootNode = resumeTab ? resumeTab.root : null;
+
+        if (rootNode && rootNode.interps.length === 0) {
+            const cmdRes = { cmd: null, result: cmds.resume() };
             rootNode.interps.push(cmdRes);
             rootNode.legacyInterps.push(cmdRes);
             this.context(this.render());

@@ -17,6 +17,8 @@ function HomePage() {
         renderTree.detectTheme();
         // Inject neofetch after theme detection
         renderTree.injectNeofetch();
+        // Seed the resume tab (client-side only; cmds.resume sniffs the UA)
+        renderTree.injectResume();
 
         if (router.isReady && router.query.post) {
             const slug = router.query.post;

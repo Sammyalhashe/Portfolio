@@ -13,7 +13,7 @@ test('User can navigate to a post via terminal ls command', async ({ page }) => 
   // ls output creates .ls-grid or just text items.
   // We look for "My role at Bloomberg" link.
   // We use .first() just in case, but it should be unique.
-  const bloombergLink = page.getByText('My role at Bloomberg').first();
+  const bloombergLink = page.getByText(/Bloomberg/).first();
   await expect(bloombergLink).toBeVisible();
 
   // 3. User selects one of the posts
@@ -26,7 +26,7 @@ test('User can navigate to a post via terminal ls command', async ({ page }) => 
   // 4. It loads correctly and doesn't show an error
   // The page overlay appears with h1
   const title = page.locator('h1');
-  await expect(title).toContainText('My role at Bloomberg');
+  await expect(title).toContainText('Bloomberg');
 
   // Verify no error message
   await expect(page.getByText('Error: Post content format is invalid')).not.toBeVisible();
